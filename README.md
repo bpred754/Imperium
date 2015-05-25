@@ -1,5 +1,7 @@
 # Imperium
 
+test
+
 1. Create directory in desired location
 2. Open terminal(Mac)/ Git Shell(PC) and navigate to created directory
 3. Run 'git init'
