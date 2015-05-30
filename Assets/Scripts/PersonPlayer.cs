@@ -72,7 +72,8 @@ public class PersonPlayer : Player
 				Debug.Log ("Hit Point = " + hit.point);
 				Debug.Log ("Object position = " + hit.collider.gameObject.transform.position);
 				Debug.Log ("--------------");*/
-				
+
+				// If building is clicked create new unit
 				if(buildings.ContainsKey(hit.collider.name)) {
 					Unit newUnit = buildings[hit.collider.name].createUnit(this.team);
 					if(newUnit != null) {
