@@ -3,19 +3,58 @@ using System.Collections;
 
 public class Unit : MonoBehaviour {
 
-	public bool selected = false;
-	private Color startColor = new Color(.2f,.2f,.2f);
+	// Logic variables
+	private bool isSelected;
+	private Team team;
 
-	// Update is called once per frame
-	private void Update () {
-		if (GetComponent<Renderer> ().isVisible && Input.GetMouseButton (0)) {
-			Vector3 camPos = Camera.main.WorldToScreenPoint(transform.position);
-			camPos.y = CameraOperator.InvertMouseY(camPos.y);
-			selected = CameraOperator.selection.Contains(camPos);
+	// Model variables
+	private Color startColor = Color.gray;
+	private Color selectedColor = Color.red;
+
+	/*********************************************************************************/
+	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
+	/*********************************************************************************/
+
+	private void Start() {
+		this.isSelected = false;
+		GetComponent<Renderer> ().material.color = startColor;
+	}
+
+	/*********************************************************************************/
+	/*	Public Functions - Order: Alphabetic										 */		
+	/*********************************************************************************/	
+
+	public bool isTeam(Team inTeam) {
+		bool isTeam = false;
+		if(this.team == inTeam) {
+			isTeam = true;
 		}
-		if (selected)
-			GetComponent<Renderer> ().material.color = Color.red;
-		else
+		return isTeam;
+	}
+	
+	public bool isVisible() {
+		return GetComponent<Renderer> ().isVisible;
+	}
+
+	/*********************************************************************************/
+	/*	Getter and Setter Functions - Order: Alphabetic							 	 */		
+	/*********************************************************************************/
+	
+	public bool getSelected() {
+		return this.isSelected;
+	}
+	
+	public void setSelected(bool selected) {
+
+		if (selected) {
+			GetComponent<Renderer> ().material.color = selectedColor;
+		} else {
 			GetComponent<Renderer> ().material.color = startColor;
+		}
+		this.isSelected = selected;
+	}
+	
+	public void setTeam(Team inTeam) {
+		this.team = inTeam;
 	}
 }
