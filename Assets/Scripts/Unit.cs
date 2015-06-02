@@ -10,6 +10,9 @@ public class Unit : MonoBehaviour {
 	// Model variables
 	private Color startColor = Color.gray;
 	private Color selectedColor = Color.red;
+	
+	private float movementSpeed = 0.9f;
+	private Vector3 newPosition;
 
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
@@ -18,6 +21,10 @@ public class Unit : MonoBehaviour {
 	private void Start() {
 		this.isSelected = false;
 		GetComponent<Renderer> ().material.color = startColor;
+	}
+
+	void Update(){
+
 	}
 
 	/*********************************************************************************/

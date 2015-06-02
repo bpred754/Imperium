@@ -166,17 +166,17 @@ public class PersonPlayer : Player
 		Vector3 movementVectorZ;
 	
 		// Scrolling with the mouse as it enters edges of screen
-		if (Input.mousePosition.y < screenScrollLimit) {
+		if (Input.mousePosition.y < screenScrollLimit && Input.mousePosition.y >= 0) {
 			movementVectorZ = new Vector3 (0f,0f,scrollRate);
 			transform.position -= movementVectorZ;
-		} else if (Input.mousePosition.y > Screen.height - screenScrollLimit) {
+		} else if (Input.mousePosition.y > Screen.height - screenScrollLimit && Input.mousePosition.y <= Screen.height) {
 			movementVectorZ = new Vector3 (0f,0f,scrollRate);
 			transform.position += movementVectorZ;
 		}
-		if (Input.mousePosition.x < screenScrollLimit) {
+		if (Input.mousePosition.x < screenScrollLimit && Input.mousePosition.x >= 0) {
 			movementVectorX = new Vector3 (scrollRate,0f,0f);
 			transform.position -= movementVectorX;
-		} else if (Input.mousePosition.x > Screen.width - screenScrollLimit) {
+		} else if (Input.mousePosition.x > Screen.width - screenScrollLimit && Input.mousePosition.x <= Screen.width) {
 			movementVectorX = new Vector3 (scrollRate,0f,0f);
 			transform.position += movementVectorX;
 		}
