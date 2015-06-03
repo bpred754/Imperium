@@ -64,9 +64,9 @@ public class PersonPlayer : Player
 	private void checkPlayerClick() {
 		
 		if (Input.GetMouseButtonDown (0)) {
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 			RaycastHit hit;
-			if (Physics.Raycast(ray, out hit)) {
+			if (Physics.Raycast (ray, out hit)) {
 				/*Debug.Log ("Name = " + hit.collider.name);
 				Debug.Log ("Tag = " + hit.collider.tag);
 				Debug.Log ("Hit Point = " + hit.point);
@@ -74,33 +74,46 @@ public class PersonPlayer : Player
 				Debug.Log ("--------------");*/
 
 				// If building is clicked create new unit
-				if(buildings.ContainsKey(hit.collider.name)) {
-					Unit newUnit = buildings[hit.collider.name].createUnit(this.team);
-					if(newUnit != null) {
-						units.Add(newUnit.name, newUnit);
+				if (buildings.ContainsKey (hit.collider.name)) {
+					Unit newUnit = buildings [hit.collider.name].createUnit (this.team);
+					if (newUnit != null) {
+						units.Add (newUnit.name, newUnit);
 						unitCount++;
 					}
 				}
 				
 				// If a unit is clicked unselect other units
-				if(units.ContainsKey(hit.collider.name)) {
+				if (units.ContainsKey (hit.collider.name)) {
 					
-					foreach(KeyValuePair<string, Unit> entry in units) {
+					foreach (KeyValuePair<string, Unit> entry in units) {
 						Unit unit = entry.Value;
-						if(entry.Key == hit.collider.name) {
-							unit.setSelected(true);
+						if (entry.Key == hit.collider.name) {
+							unit.setSelected (true);
 						} else {
-							unit.setSelected(false);
+							unit.setSelected (false);
 						}
 					}
 				}
 				
 				// If the ground is clicked unselect units
-				if(hit.collider.name == "Ground") {
-					foreach(KeyValuePair<string,Unit> entry in units) {
+				if (hit.collider.name == "Ground") {
+					foreach (KeyValuePair<string,Unit> entry in units) {
 						Unit unit = entry.Value;
-						unit.setSelected(false);
+						unit.setSelected (false);
 					}
+				}
+			}
+		} //If right click is pressed down, i.e. move order is made
+		else if (Input.GetMouseButtonDown (1)) {
+			//Creates move order based on mouse screen coordinates
+			Vector3 moveOrder = Input.mousePosition;
+			//Cycles through unit dictionary
+			foreach(KeyValuePair<string, Unit> entry in units){
+				Unit unit = entry.Value;
+				//If unit is selecected
+				if(unit.getSelected()){
+					//Give unit move order
+					giveMoveOrder(moveOrder,unit);
 				}
 			}
 		}
@@ -151,7 +164,22 @@ public class PersonPlayer : Player
 			}			
 		}*/
 	}
+	//Takes a unit and a move order and moves unit to that location
+	private void giveMoveOrder(Vector3 moveOrder, Unit unit){
+		//Sets z to current camera height, this needs to be updated for varying heights of camera
+		moveOrder.z = 28;
+		//Debug.Log ("moveOrder1: " + moveOrder.ToString());
+		//Converts screen coordinates of move order to world coordinates
+		moveOrder = Camera.main.ScreenToWorldPoint(moveOrder);
+		//Y gets set to zero because they aren't moving in that direction at all
+		//Mouse height somtimes changes depending on where you click so this is necessary
+		moveOrder.y = 0;
+		//Debug.Log ("moveOrder2: " + moveOrder.ToString());
+		//Commits move order in unit class.
+		unit.makeMove(moveOrder);
 
+	}
+	
 	// Inverts the Y component of the mouse vector
 	private static float InvertMouseY(float y)
 	{
