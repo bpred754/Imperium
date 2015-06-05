@@ -31,7 +31,6 @@ public class PersonPlayer : Player
 		checkPlayerClick();
 		checkPlayerSelection();
 		moveCamera();
-		//moveUnits ();
 	}
 
 	// Called several times per frame when needed
@@ -62,6 +61,11 @@ public class PersonPlayer : Player
 
 	// Executes logic when user clicks
 	private void checkPlayerClick() {
+
+		bool isControlPressed = false;
+		if (Input.GetKey (KeyCode.LeftControl)) {
+			isControlPressed = true;
+		}
 		
 		if (Input.GetMouseButtonDown (0)) {
 			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
@@ -84,13 +88,15 @@ public class PersonPlayer : Player
 				
 				// If a unit is clicked unselect other units
 				if (units.ContainsKey (hit.collider.name)) {
-					
 					foreach (KeyValuePair<string, Unit> entry in units) {
 						Unit unit = entry.Value;
 						if (entry.Key == hit.collider.name) {
 							unit.setSelected (true);
 						} else {
-							unit.setSelected (false);
+							// Don't unselect units if the control key is pressed
+							if(!isControlPressed) {
+								unit.setSelected (false);
+							}
 						}
 					}
 				}
@@ -122,7 +128,7 @@ public class PersonPlayer : Player
 	// Executes logic when user clicks and drags (creates selection box)
 	private void checkPlayerSelection() {
 
-		// Detect button press
+		// Detect mouse click
 		if(Input.GetMouseButtonDown(0)) {
 			startClick = Input.mousePosition;
 		} else if (Input.GetMouseButtonUp(0)) {
@@ -225,15 +231,5 @@ public class PersonPlayer : Player
 			transform.position += movementVectorX;
 		}
 	}
-
-	// Logic to move units
-	/*private void moveUnits() {
-		for (int i = 0; i < units.Length; i++) {
-			Unit unit = units[i];
-			if(unit.getSelected() && startClick.x > 0) {
-				unit.transform.Translate(Vector3.forward * Time.deltaTime);
-			}
-		}
-	}*/
 }
 
