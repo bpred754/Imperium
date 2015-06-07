@@ -17,7 +17,9 @@ public class PersonPlayer : Player
 	private Dictionary<string, Unit> units = new Dictionary<string, Unit> ();
 	private Dictionary<string, Building> buildings = new Dictionary<string, Building> ();
 	private int unitCount = 0;
+	private int selectedUnitCount = 0;
 	private int buildingCount = 0;
+	private List<Unit> selectedUnitsList;
 
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
@@ -103,9 +105,11 @@ public class PersonPlayer : Player
 				
 				// If the ground is clicked unselect units
 				if (hit.collider.name == "Ground") {
-					foreach (KeyValuePair<string,Unit> entry in units) {
-						Unit unit = entry.Value;
-						unit.setSelected (false);
+					if(!isControlPressed){
+						foreach (KeyValuePair<string,Unit> entry in units) {
+							Unit unit = entry.Value;
+							unit.setSelected (false);
+						}
 					}
 				}
 			}
@@ -119,6 +123,7 @@ public class PersonPlayer : Player
 				//If unit is selecected
 				if(unit.getSelected()){
 					//Give unit move order
+					//Debug.Log(getNumUnitsSelected());
 					giveMoveOrder(moveOrder,unit);
 				}
 			}
@@ -177,11 +182,13 @@ public class PersonPlayer : Player
 		//Debug.Log ("moveOrder1: " + moveOrder.ToString());
 		//Converts screen coordinates of move order to world coordinates
 		moveOrder = Camera.main.ScreenToWorldPoint(moveOrder);
+		moveOrder.y = unit.transform.position.y;
 		//Y gets set to zero because they aren't moving in that direction at all
 		//Mouse height somtimes changes depending on where you click so this is necessary
-		moveOrder.y = 0;
+		//moveOrder.y = 0;
 		//Debug.Log ("moveOrder2: " + moveOrder.ToString());
 		//Commits move order in unit class.
+
 		unit.makeMove(moveOrder);
 
 	}
@@ -230,6 +237,31 @@ public class PersonPlayer : Player
 			movementVectorX = new Vector3 (scrollRate,0f,0f);
 			transform.position += movementVectorX;
 		}
+	}
+
+	//Creates formation, takes string:formationName
+	private void createFormation(string formationName){
+		Vector3 mousePosition = Input.mousePosition;
+
+
+	}
+
+	private int getNumUnitsSelected(){
+		//unitCount
+		//"Cluster" will be default. Units attempts to be as close to center as possible without overlapping eachother.
+
+		//clears the list to make way for new units
+		selectedUnitsList.Clear ();
+
+		foreach (KeyValuePair<string,Unit> entry in units) {
+			Unit unit = entry.Value;
+			if(unit.getSelected()){
+				selectedUnitsList.Add(unit);
+			}
+		}
+		//sets class variable to be used when necessary without high overhead. hopefully.
+		selectedUnitCount = selectedUnitsList.Count;
+		return selectedUnitsList.Count;
 	}
 }
 

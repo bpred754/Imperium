@@ -6,9 +6,10 @@ public class Unit : MonoBehaviour {
 	// Logic variables
 	private bool isSelected;
 	private Team team;
-	private float movementSpeed = 0.9f;
+	private float movementSpeed = 2.0f;
 	private Vector3 destination;
 	private bool isMoving = false;
+	private Vector3 testPosition;
 
 	// Model variables
 	private Color startColor = Color.gray;
@@ -22,18 +23,28 @@ public class Unit : MonoBehaviour {
 	private void Start() {
 		this.isSelected = false;
 		GetComponent<Renderer> ().material.color = startColor;
+		testPosition = transform.position;
+	}
+
+	void Update(){
+
 	}
 	//While isMoving = true, units move towards their targets
-	void Update(){
+	//Fixed Update is used because it is a physics update, happens more often
+	void FixedUpdate(){
+		testPosition = transform.position;
 		if (isMoving) {
+			//Debug.Log ("Unit is moving");
 			float step = movementSpeed * Time.deltaTime;
 			transform.position = Vector3.MoveTowards (transform.position, destination, step);
 			//Unfortunately this never occurs, I am trying to figure it out.
 			//Movement still works though, they just keep adjusting their positions.
-			if(transform.position == destination){
+			//Debug.Log (testPosition + " " + transform.position);
+			if(transform.position.x == testPosition.x && transform.position.z == testPosition.z){
 				isMoving = false;
-				Debug.Log ("Unit has stopped moving");
+				//Debug.Log ("Unit has stopped moving");
 			}
+			
 		}
 	}
 
