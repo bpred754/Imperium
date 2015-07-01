@@ -14,7 +14,7 @@ public class Unit : MonoBehaviour {
 	// Model variables
 	private Color startColor = Color.gray;
 	private Color selectedColor = Color.red;
-
+	Transform sphere;
 
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
@@ -24,6 +24,8 @@ public class Unit : MonoBehaviour {
 		this.isSelected = false;
 		GetComponent<Renderer> ().material.color = startColor;
 		testPosition = transform.position;
+		sphere = transform.FindChild ("Sphere");
+		sphere.GetComponent<Renderer> ().material.color = startColor;
 	}
 
 	void Update(){
@@ -84,8 +86,10 @@ public class Unit : MonoBehaviour {
 
 		if (selected) {
 			GetComponent<Renderer> ().material.color = selectedColor;
+			sphere.GetComponent<Renderer> ().material.color = selectedColor;
 		} else {
 			GetComponent<Renderer> ().material.color = startColor;
+			sphere.GetComponent<Renderer> ().material.color = startColor;
 		}
 		this.isSelected = selected;
 	}

@@ -19,7 +19,7 @@ public class PersonPlayer : Player
 	private int unitCount = 0;
 	private int selectedUnitCount = 0;
 	private int buildingCount = 0;
-	private List<Unit> selectedUnitsList;
+	private List<Unit> selectedUnitsList = new List<Unit>();
 
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
@@ -117,16 +117,14 @@ public class PersonPlayer : Player
 		else if (Input.GetMouseButtonDown (1)) {
 			//Creates move order based on mouse screen coordinates
 			Vector3 moveOrder = Input.mousePosition;
-			//Cycles through unit dictionary
-			foreach(KeyValuePair<string, Unit> entry in units){
-				Unit unit = entry.Value;
-				//If unit is selecected
-				if(unit.getSelected()){
-					//Give unit move order
-					//Debug.Log(getNumUnitsSelected());
-					giveMoveOrder(moveOrder,unit);
-				}
-			}
+			//Creates formation with units selected
+			//My dad thinks there should be a new "formation" class that gets made right now
+			// on the right mouse click. The formation code probably shouldn't be in person player.
+			// I just don't where else to put it.
+			//createFormation ("Square");
+			createFormation("Shell");
+			//createFormation ("Clustered");
+			//createFormation ("V");
 		}
 	}
 
@@ -190,7 +188,6 @@ public class PersonPlayer : Player
 		//Commits move order in unit class.
 
 		unit.makeMove(moveOrder);
-
 	}
 	
 	// Inverts the Y component of the mouse vector
@@ -242,8 +239,60 @@ public class PersonPlayer : Player
 	//Creates formation, takes string:formationName
 	private void createFormation(string formationName){
 		Vector3 mousePosition = Input.mousePosition;
+		Vector3 movePosition = mousePosition;
+		int numberUnits = getNumUnitsSelected ();
+		int unitSpace = 25;
+		if (formationName == "Square" || formationName == "Squared") {
+			float side = Mathf.Sqrt (numberUnits);
+			float middleSide = (side/2)*unitSpace;
+			foreach (Unit unit in selectedUnitsList) {
+				giveMoveOrder (movePosition, unit);
+				movePosition.x += unitSpace;
+				if (movePosition.x >= mousePosition.x + unitSpace * side) {
+					movePosition.x = mousePosition.x;
+					movePosition.y -= unitSpace;
+				}
+				//loops through rings of hexagons
+				//first ring 1 unit, second ring 6 units, third ring 12 units, fourth ring 18 units
+			}
+		} else if (formationName == "Shell" || formationName == "Shelled") {
+			int circumference = unitSpace * numberUnits * 2;
+			float radius = circumference / (Mathf.PI * 2);
+			float degreeOffset = 360 / numberUnits;
+			float radOffset = (degreeOffset * Mathf.PI) / 180;
+			float radianOffset = 0;
 
+			if (numberUnits == 1) {
+				foreach (Unit unit in selectedUnitsList) {
+					giveMoveOrder (movePosition, unit);
+				}
+			} else {
+				foreach (Unit unit in selectedUnitsList) {
+					float x;
+					float y;
+					movePosition = mousePosition;
 
+					movePosition.x += radius * Mathf.Sin (radianOffset);
+					movePosition.y += radius * Mathf.Cos (radianOffset);
+	
+					giveMoveOrder (movePosition, unit);
+
+					radianOffset += radOffset;
+				}
+			}
+		} else if (formationName == "V") {
+			int count = 0;
+			foreach (Unit unit in selectedUnitsList) {
+				count += 1;
+				if(count == 1){
+					giveMoveOrder (movePosition, unit);
+				} else if ((count % 2) == 1){//if odd
+					
+				} else {
+
+				}
+			}
+		}
 	}
 
 	private int getNumUnitsSelected(){
@@ -252,6 +301,7 @@ public class PersonPlayer : Player
 
 		//clears the list to make way for new units
 		selectedUnitsList.Clear ();
+		//selectedUnitsList = new List<Unit>();
 
 		foreach (KeyValuePair<string,Unit> entry in units) {
 			Unit unit = entry.Value;
