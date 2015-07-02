@@ -121,8 +121,8 @@ public class PersonPlayer : Player
 			//My dad thinks there should be a new "formation" class that gets made right now
 			// on the right mouse click. The formation code probably shouldn't be in person player.
 			// I just don't where else to put it.
-			//createFormation ("Square");
-			createFormation("Shell");
+			createFormation ("Square");
+			//createFormation("Shell");
 			//createFormation ("Clustered");
 			//createFormation ("V");
 		}

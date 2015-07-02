@@ -12,7 +12,7 @@ public class Unit : MonoBehaviour {
 	private Vector3 testPosition;
 
 	// Model variables
-	private Color startColor = Color.gray;
+	private Color startColor = Color.black;
 	private Color selectedColor = Color.red;
 	Transform sphere;
 
