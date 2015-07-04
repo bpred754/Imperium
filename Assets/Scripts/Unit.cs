@@ -6,15 +6,20 @@ public class Unit : MonoBehaviour {
 	// Logic variables
 	private bool isSelected;
 	private Team team;
-	private float movementSpeed = 2.0f;
+	private float movementSpeed = 5;
 	private Vector3 destination;
-	private bool isMoving = false;
+	//private bool isMoving = false;
 	private Vector3 testPosition;
+	private bool isMoving = false;
 
 	// Model variables
 	private Color startColor = Color.black;
 	private Color selectedColor = Color.red;
 	Transform sphere;
+
+	Vector3[] path;
+	int targetIndex;
+
 
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
@@ -28,12 +33,9 @@ public class Unit : MonoBehaviour {
 		sphere.GetComponent<Renderer> ().material.color = startColor;
 	}
 
-	void Update(){
-
-	}
 	//While isMoving = true, units move towards their targets
 	//Fixed Update is used because it is a physics update, happens more often
-	void FixedUpdate(){
+	/*void FixedUpdate(){
 		testPosition = transform.position;
 		if (isMoving) {
 			//Debug.Log ("Unit is moving");
@@ -48,11 +50,40 @@ public class Unit : MonoBehaviour {
 			}
 			
 		}
-	}
+	}*/
 
 	/*********************************************************************************/
 	/*	Public Functions - Order: Alphabetic										 */		
 	/*********************************************************************************/	
+
+	public void OnPathFound(Vector3[] newPath, bool pathSuccessful){
+		if(pathSuccessful){
+			path = newPath;
+			StopCoroutine("FollowPath");
+			StartCoroutine("FollowPath");
+		}
+	}
+	
+	IEnumerator FollowPath() {
+		if(path.GetLength(0) > 0){
+			Vector3 currentWaypoint = path[0];
+			targetIndex = 0;
+			isMoving = true;
+			
+			while(true){
+				if (transform.position.x == currentWaypoint.x && transform.position.z == currentWaypoint.z){
+					targetIndex++;
+					if(targetIndex >= path.Length){
+						yield break;
+					}
+					currentWaypoint = path[targetIndex];
+				}
+
+				transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, movementSpeed * Time.deltaTime);
+				yield return null;
+			}
+		}
+	}
 
 	public bool isTeam(Team inTeam) {
 		bool isTeam = false;
@@ -65,13 +96,12 @@ public class Unit : MonoBehaviour {
 	public bool isVisible() {
 		return GetComponent<Renderer> ().isVisible;
 	}
+
 	//Sets the destination to the target and isMoving to true.
 	//Movement gets done in Update method.
 	public void makeMove(Vector3 destination){ //Maybe should return bool, if unit cannot get to location return false?? otherwise true?
-		//For now void, We can think about that later, when we are doing pathfinding etc.
-		this.destination = destination;
-		//Debug.Log ("Destination: " + destination.ToString ());
-		isMoving = true;		
+		destination.y = transform.position.y;
+		PathRequestManager.RequestPath(transform.position, destination, OnPathFound);		
 	}
 
 	/*********************************************************************************/
@@ -96,5 +126,21 @@ public class Unit : MonoBehaviour {
 	
 	public void setTeam(Team inTeam) {
 		this.team = inTeam;
+	}
+
+	public void OnDrawGizmos() {
+		if (path != null) {
+			for (int i = targetIndex; i < path.Length; i ++) {
+				Gizmos.color = Color.yellow;
+				Gizmos.DrawCube(path[i], Vector3.one);
+				
+				if (i == targetIndex) {
+					Gizmos.DrawLine(transform.position, path[i]);
+				}
+				else {
+					Gizmos.DrawLine(path[i-1],path[i]);
+				}
+			}
+		}
 	}
 }

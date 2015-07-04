@@ -121,10 +121,8 @@ public class PersonPlayer : Player
 			//My dad thinks there should be a new "formation" class that gets made right now
 			// on the right mouse click. The formation code probably shouldn't be in person player.
 			// I just don't where else to put it.
-			createFormation ("Square");
-			//createFormation("Shell");
-			//createFormation ("Clustered");
-			//createFormation ("V");
+			//createFormation ("Square");
+			createFormation("Shell");
 		}
 	}
 
@@ -238,58 +236,58 @@ public class PersonPlayer : Player
 
 	//Creates formation, takes string:formationName
 	private void createFormation(string formationName){
-		Vector3 mousePosition = Input.mousePosition;
-		Vector3 movePosition = mousePosition;
-		int numberUnits = getNumUnitsSelected ();
-		int unitSpace = 25;
-		if (formationName == "Square" || formationName == "Squared") {
-			float side = Mathf.Sqrt (numberUnits);
-			float middleSide = (side/2)*unitSpace;
-			foreach (Unit unit in selectedUnitsList) {
-				giveMoveOrder (movePosition, unit);
-				movePosition.x += unitSpace;
-				if (movePosition.x >= mousePosition.x + unitSpace * side) {
-					movePosition.x = mousePosition.x;
-					movePosition.y -= unitSpace;
-				}
-				//loops through rings of hexagons
-				//first ring 1 unit, second ring 6 units, third ring 12 units, fourth ring 18 units
-			}
-		} else if (formationName == "Shell" || formationName == "Shelled") {
-			int circumference = unitSpace * numberUnits * 2;
-			float radius = circumference / (Mathf.PI * 2);
-			float degreeOffset = 360 / numberUnits;
-			float radOffset = (degreeOffset * Mathf.PI) / 180;
-			float radianOffset = 0;
-
-			if (numberUnits == 1) {
+		if(getNumUnitsSelected() > 0){
+			Vector3 mousePosition = Input.mousePosition;
+			Vector3 movePosition = mousePosition;
+			int numberUnits = getNumUnitsSelected ();
+			int unitSpace = 15;
+			if (formationName == "Square" || formationName == "Squared") {
+				float side = Mathf.Sqrt (numberUnits);
+				float middleSide = (side/2)*unitSpace;
 				foreach (Unit unit in selectedUnitsList) {
 					giveMoveOrder (movePosition, unit);
+					movePosition.x += unitSpace;
+					if (movePosition.x >= mousePosition.x + unitSpace * side) {
+						movePosition.x = mousePosition.x;
+						movePosition.y -= unitSpace;
+					}
+					//loops through rings of hexagons
+					//first ring 1 unit, second ring 6 units, third ring 12 units, fourth ring 18 units
 				}
-			} else {
-				foreach (Unit unit in selectedUnitsList) {
-					float x;
-					float y;
-					movePosition = mousePosition;
+			} else if (formationName == "Shell" || formationName == "Shelled") {
+				int circumference = unitSpace * numberUnits * 2;
+				float radius = circumference / (Mathf.PI * 2);
+				float degreeOffset = 360 / numberUnits;
+				float radOffset = (degreeOffset * Mathf.PI) / 180;
+				float radianOffset = 0;
 
-					movePosition.x += radius * Mathf.Sin (radianOffset);
-					movePosition.y += radius * Mathf.Cos (radianOffset);
-	
-					giveMoveOrder (movePosition, unit);
-
-					radianOffset += radOffset;
-				}
-			}
-		} else if (formationName == "V") {
-			int count = 0;
-			foreach (Unit unit in selectedUnitsList) {
-				count += 1;
-				if(count == 1){
-					giveMoveOrder (movePosition, unit);
-				} else if ((count % 2) == 1){//if odd
-					
+				if (numberUnits == 1) {
+					foreach (Unit unit in selectedUnitsList) {
+						giveMoveOrder (movePosition, unit);
+					}
 				} else {
+					foreach (Unit unit in selectedUnitsList) {
+						movePosition = mousePosition;
 
+						movePosition.x += radius * Mathf.Sin (radianOffset);
+						movePosition.y += radius * Mathf.Cos (radianOffset);
+		
+						giveMoveOrder (movePosition, unit);
+
+						radianOffset += radOffset;
+					}
+				}
+			} else if (formationName == "V") {
+				int count = 0;
+				foreach (Unit unit in selectedUnitsList) {
+					count += 1;
+					if(count == 1){
+						giveMoveOrder (movePosition, unit);
+					} else if ((count % 2) == 1){//if odd
+						
+					} else {
+
+					}
 				}
 			}
 		}
