@@ -6,11 +6,12 @@ public class Unit : MonoBehaviour {
 	// Logic variables
 	private bool isSelected;
 	private Team team;
-	private float movementSpeed = 5;
+	public float movementSpeed;
 	private Vector3 destination;
 	//private bool isMoving = false;
 	private Vector3 testPosition;
 	private bool isMoving = false;
+	public bool displayWayPointGizmos;
 
 	// Model variables
 	private Color startColor = Color.black;
@@ -129,16 +130,17 @@ public class Unit : MonoBehaviour {
 	}
 
 	public void OnDrawGizmos() {
-		if (path != null) {
-			for (int i = targetIndex; i < path.Length; i ++) {
-				Gizmos.color = Color.yellow;
-				Gizmos.DrawCube(path[i], Vector3.one);
-				
-				if (i == targetIndex) {
-					Gizmos.DrawLine(transform.position, path[i]);
-				}
-				else {
-					Gizmos.DrawLine(path[i-1],path[i]);
+		if (displayWayPointGizmos) {
+			if (path != null) {
+				for (int i = targetIndex; i < path.Length; i ++) {
+					Gizmos.color = Color.cyan;
+					Gizmos.DrawCube (path [i], Vector3.one);
+					
+					if (i == targetIndex) {
+						Gizmos.DrawLine (transform.position, path [i]);
+					} else {
+						Gizmos.DrawLine (path [i - 1], path [i]);
+					}
 				}
 			}
 		}

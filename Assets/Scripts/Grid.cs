@@ -20,9 +20,9 @@ public class Grid : MonoBehaviour {
 		CreateGrid ();
 	}
 
-	/*void Update(){
+	void Update(){
 		CreateGrid ();
-	}*/
+	}
 
 	public int MaxSize{
 		get{
@@ -30,7 +30,7 @@ public class Grid : MonoBehaviour {
 		}
 	}
 
-	void CreateGrid(){
+	public void CreateGrid(){
 		grid = new Node[gridSizeX, gridSizeY];
 		Vector3 worldBottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
 

@@ -29,40 +29,52 @@ public class PathFinding : MonoBehaviour {
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint(targetPos);
 
-		if(startNode.walkable && targetNode.walkable){
-			Heap<Node> openSet = new Heap<Node>(grid.MaxSize);
-			HashSet<Node> closedSet = new HashSet<Node>();
-			openSet.Add(startNode);
+		//This one doesn't let units move if they are currently on an unwalkable square
+		//We'll have to make sure units never get created on unwalkable squares or get placed there
+		//in some other fashion. But I felt it was best to let them move out of an unwalkable
+		//location if it accidently happens
+		//if(startNode.walkable && targetNode.walkable){
+		if (targetNode.walkable) {
+			Heap<Node> openSet = new Heap<Node> (grid.MaxSize);
+			HashSet<Node> closedSet = new HashSet<Node> ();
+			openSet.Add (startNode);
 
-			while(openSet.Count > 0){
-				Node currentNode = openSet.RemoveFirst();
-				closedSet.Add(currentNode);
+			while (openSet.Count > 0) {
+				Node currentNode = openSet.RemoveFirst ();
+				closedSet.Add (currentNode);
 
-				if(currentNode == targetNode){
+				if (currentNode == targetNode) {
 					pathSuccess = true;
 					break;
 				}
 
-				foreach(Node neighbor in grid.GetNeighbors(currentNode)){
-					if(!neighbor.walkable || closedSet.Contains(neighbor)){
-					   continue;
+				foreach (Node neighbor in grid.GetNeighbors(currentNode)) {
+					if (!neighbor.walkable || closedSet.Contains (neighbor)) {
+						continue;
 					}
 
-					int newMovementCostToNeighbor = currentNode.gCost + GetDistance(currentNode,neighbor);
-					if(newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains(neighbor)){
+					int newMovementCostToNeighbor = currentNode.gCost + GetDistance (currentNode, neighbor);
+					if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains (neighbor)) {
 						neighbor.gCost = newMovementCostToNeighbor;
-						neighbor.hCost = GetDistance(neighbor,targetNode);
+						neighbor.hCost = GetDistance (neighbor, targetNode);
 						neighbor.parent = currentNode;
 
-						if(!openSet.Contains(neighbor)){
+						if (!openSet.Contains (neighbor)) {
 							openSet.Add (neighbor);
+						}else{
+							openSet.UpdateItem(neighbor);
 						}
 					}
 					//else{
-						//openSet.UpdateItem(neighbor);
+					//openSet.UpdateItem(neighbor);
 					//}
 				}
 			}
+			//if the end location is NOT walkable
+		} else {
+			/////////////////////////////////////////////////////
+			//look for closest neighbor node that is available
+			/////////////////////////////////////////////////////
 		}
 		yield return null;
 		if(pathSuccess){

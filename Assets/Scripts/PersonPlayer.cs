@@ -50,7 +50,7 @@ public class PersonPlayer : Player
 
 	public void createBuilding(Vector3 position) {
 		Building buildingObject = (Building)Instantiate(building, position, Quaternion.identity);
-		buildingObject.initialize (position);
+		buildingObject.initialize (position, buildingCount);
 		string buildingName = BUILDING + buildingCount;
 		buildingObject.name = buildingName;
 		buildings.Add(buildingName, buildingObject);
@@ -121,8 +121,13 @@ public class PersonPlayer : Player
 			//My dad thinks there should be a new "formation" class that gets made right now
 			// on the right mouse click. The formation code probably shouldn't be in person player.
 			// I just don't where else to put it.
-			//createFormation ("Square");
-			createFormation("Shell");
+
+		/// ///////////////////////////////////////////////////////
+		/// Formations
+		/// ///////////////////////////////////////////////////////
+
+			createFormation ("Square");
+			//createFormation("Shell");
 		}
 	}
 

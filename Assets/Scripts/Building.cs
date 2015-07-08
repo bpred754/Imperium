@@ -18,7 +18,9 @@ public class Building : MonoBehaviour
 	private int unitCount = 0;
 	private Vector3 position;
 	private KeyValuePair<Vector3,bool>[] availablePositions = new KeyValuePair<Vector3,bool>[12];
+	int buildingNum;
 
+	Grid grid;
 
 	// Model variables
 	private Color startColor = new Color(0,1f,0);
@@ -27,10 +29,14 @@ public class Building : MonoBehaviour
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
 
+	void Awake(){
+		grid = GetComponent<Grid>();
+	}
+
 	private void Start() {
 		gameObject.layer = LayerMask.NameToLayer ("Unwalkable");
 	}
-	
+
 	private void OnMouseDown() {
 		//Debug.Log("Building Selected");
 		//setSelected (!isSelected);
@@ -47,7 +53,7 @@ public class Building : MonoBehaviour
 			if(availablePositions[i].Value) {
 				availablePositions[i] = new KeyValuePair<Vector3, bool>(availablePositions[i].Key,false);
 				unitObject = (Unit)Instantiate(unit, availablePositions[i].Key, Quaternion.identity);
-				unitObject.name = UNIT + unitCount;
+				unitObject.name = UNIT + buildingNum + unitCount;
 				unitObject.setTeam(inTeam);
 				unitCount++;
 				break;
@@ -56,8 +62,9 @@ public class Building : MonoBehaviour
 		return unitObject;
 	}
 	
-	public void initialize(Vector3 inPosition) {
+	public void initialize(Vector3 inPosition, int buildingNum) {
 		this.position = inPosition;
+		this.buildingNum = buildingNum;
 		
 		int index = 0;
 		for(int z = (int)this.position.z - 3; z <= (int)this.position.z + 3 && index < this.availablePositions.Length; z = z + 2) {
@@ -68,6 +75,7 @@ public class Building : MonoBehaviour
 				}
 			}
 		}
+		//grid.CreateGrid ();
 	}
 
 	public bool isTeam(Team inTeam) {
