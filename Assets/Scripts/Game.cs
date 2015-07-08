@@ -15,6 +15,8 @@ public class Game : MonoBehaviour {
 		this.player.setTeam (Team.Allies);
 		this.player.createBuilding (new Vector3 (40f, 1f, 45f)); // Create base
 		this.player.createBuilding (new Vector3 (45f, 1f, 40f)); // Create base
+		this.player.createBuilding (new Vector3 (45f, 1f, 45f)); // Create base
+		this.player.createBuilding (new Vector3 (40f, 1f, 40f)); // Create base
 	}
 	
 	// Update is called once per frame

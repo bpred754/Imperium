@@ -202,7 +202,7 @@ public class PersonPlayer : Player
 	// Executes logic when the user moves the camera
 	private void moveCamera() {
 		int screenScrollLimit = 100;
-		float scrollRate = 0.2f;
+		float scrollRate = 0.4f;
 		Vector3 movementVectorX;
 		Vector3 movementVectorZ;
 	
