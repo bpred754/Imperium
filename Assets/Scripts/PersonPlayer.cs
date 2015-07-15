@@ -126,8 +126,8 @@ public class PersonPlayer : Player
 		/// Formations
 		/// ///////////////////////////////////////////////////////
 
-			createFormation ("Square");
-			//createFormation("Shell");
+			//createFormation ("Square");
+			createFormation("Shell");
 		}
 	}
 

@@ -75,12 +75,28 @@ public class PathFinding : MonoBehaviour {
 			/////////////////////////////////////////////////////
 			//look for closest neighbor node that is available
 			/////////////////////////////////////////////////////
+
+			Debug.Log("Finding new target...");
+
+			//Getting neighbors
+			List<Node> neighbors = new List<Node>();
+			neighbors = grid.GetNeighbors(targetNode);
+
+			foreach(Node neighbor in neighbors){
+				if(neighbor.walkable){
+					StartFindPath(startPos,neighbor.worldPosition);
+					Debug.Log("Target acquired");
+					break;
+				}
+			}
+
+
 		}
 		yield return null;
 		if(pathSuccess){
 			wayPoints = RetracePath(startNode,targetNode);
+			requestManager.FinishedProcessingPath(wayPoints,pathSuccess);
 		}
-		requestManager.FinishedProcessingPath(wayPoints,pathSuccess);
 	}
 
 	Vector3[] RetracePath(Node startNode, Node endNode){
