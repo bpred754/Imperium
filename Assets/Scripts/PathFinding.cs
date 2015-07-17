@@ -65,37 +65,15 @@ public class PathFinding : MonoBehaviour {
 							openSet.UpdateItem(neighbor);
 						}
 					}
-					//else{
-					//openSet.UpdateItem(neighbor);
-					//}
 				}
 			}
-			//if the end location is NOT walkable
-		} else {
-			/////////////////////////////////////////////////////
-			//look for closest neighbor node that is available
-			/////////////////////////////////////////////////////
-
-			Debug.Log("Finding new target...");
-
-			//Getting neighbors
-			List<Node> neighbors = new List<Node>();
-			neighbors = grid.GetNeighbors(targetNode);
-
-			foreach(Node neighbor in neighbors){
-				if(neighbor.walkable){
-					StartFindPath(startPos,neighbor.worldPosition);
-					Debug.Log("Target acquired");
-					break;
-				}
-			}
-
-
 		}
 		yield return null;
-		if(pathSuccess){
-			wayPoints = RetracePath(startNode,targetNode);
-			requestManager.FinishedProcessingPath(wayPoints,pathSuccess);
+		if (pathSuccess) {
+			wayPoints = RetracePath (startNode, targetNode);
+			requestManager.FinishedProcessingPath (wayPoints, pathSuccess);
+		} else {
+			requestManager.FinishedProcessingPath (wayPoints, pathSuccess);
 		}
 	}
 
