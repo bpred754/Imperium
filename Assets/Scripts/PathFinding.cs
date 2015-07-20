@@ -8,6 +8,7 @@ public class PathFinding : MonoBehaviour {
 	PathRequestManager requestManager;
 
 	Vector3 targetPosition;
+	bool newTarget = false;
 
 	Grid grid;
 
@@ -28,12 +29,26 @@ public class PathFinding : MonoBehaviour {
 
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint(targetPos);
+		newTarget = false;
 
 		//This one doesn't let units move if they are currently on an unwalkable square
 		//We'll have to make sure units never get created on unwalkable squares or get placed there
 		//in some other fashion. But I felt it was best to let them move out of an unwalkable
 		//location if it accidently happens
 		//if(startNode.walkable && targetNode.walkable){
+		
+
+		if(!targetNode.walkable){
+			newTarget = true;
+			//Debug.Log ("Target is unwalkable...");
+			//Debug.Log ("Original Target: " + targetNode.gridX + ", " + targetNode.gridY);
+
+			targetNode  = FindNearestNeighbor(targetNode);
+
+			//Debug.Log ("New Target: " + targetNode.gridX + ", " + targetNode.gridY);
+		}
+
+
 		if (targetNode.walkable) {
 			Heap<Node> openSet = new Heap<Node> (grid.MaxSize);
 			HashSet<Node> closedSet = new HashSet<Node> ();
@@ -70,9 +85,11 @@ public class PathFinding : MonoBehaviour {
 		}
 		yield return null;
 		if (pathSuccess) {
+			//Debug.Log ("Path found...");
 			wayPoints = RetracePath (startNode, targetNode);
 			requestManager.FinishedProcessingPath (wayPoints, pathSuccess);
 		} else {
+			//Debug.Log ("No path found...");
 			requestManager.FinishedProcessingPath (wayPoints, pathSuccess);
 		}
 	}
@@ -89,8 +106,10 @@ public class PathFinding : MonoBehaviour {
 			Vector3[] waypoints = SimplifyPath(path);
 			Array.Reverse (waypoints);
 			//Debug.Log ("WayPoints Length: " + waypoints.Length);
-			if(waypoints.Length > 0){
+			if(waypoints.Length > 0 && !newTarget){
 				waypoints[waypoints.Length-1] = targetPosition;
+				return waypoints;
+			}else{
 				return waypoints;
 			}
 		}
@@ -121,5 +140,71 @@ public class PathFinding : MonoBehaviour {
 			return 14*distY + 10*(distX-distY);
 		else
 			return 14*distX + 10*(distY-distX);
+	}
+
+	Node FindNearestNeighbor(Node targetNode){
+		//Debug.Log ("Acquiring new target...");
+		if(!targetNode.walkable){
+			List<Node> toCheck = new List<Node>();
+			List<Node> newNeighbors = new List<Node>();
+			newNeighbors.Add(targetNode);
+			List<Node> Checked = new List<Node>();
+			//int testCount = 0;
+
+			while(true){
+				//Debug.Log ("Searching...");
+				//Debug.Log ("newNeighbors: " + newNeighbors.Count);
+
+				toCheck.Clear();
+				foreach(Node node in newNeighbors){
+					toCheck.Add(node);
+				}
+				newNeighbors.Clear();
+				//testCount++;
+
+				//Debug.Log ("toCheck: " + toCheck.Count);
+				//Debug.Log ("Checked: " + Checked.Count);
+
+				//Test Break
+				//if(testCount >= 20){
+				//	Debug.Log ("Acquisition failed 1...");
+				//	return(targetNode);
+				//}
+				//if(toCheck.Count == 0){
+				//	Debug.Log ("Acquisition failed 2...");
+				//	return(targetNode);
+				//}
+				//check current list of Nodes
+				foreach(Node node in toCheck){
+					if(node.walkable){
+						//Debug.Log ("Target Acquired...");
+						return node;
+					}else{
+						if(!Checked.Contains (node)){
+							Checked.Add (node);
+						}
+						List<Node> temps = GetNeighbors (node);
+						foreach( Node temp in temps){
+							if(!Checked.Contains(temp) && !newNeighbors.Contains(temp)){
+								newNeighbors.Add (temp);
+							}
+						}
+					}
+				}
+			}
+		}else{
+
+			return(targetNode);
+		}
+	}
+
+	List<Node> GetNeighbors(Node targetNode){
+		List<Node> tempList = new List<Node>();
+		tempList.Add (grid.NodeFromGridPoint(targetNode.gridX + 1, targetNode.gridY + 1));
+		tempList.Add (grid.NodeFromGridPoint(targetNode.gridX + 1, targetNode.gridY - 1));
+		tempList.Add (grid.NodeFromGridPoint(targetNode.gridX - 1, targetNode.gridY + 1));
+		tempList.Add (grid.NodeFromGridPoint(targetNode.gridX - 1, targetNode.gridY - 1));
+		return(tempList);
+
 	}
 }

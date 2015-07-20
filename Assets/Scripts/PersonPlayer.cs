@@ -17,7 +17,6 @@ public class PersonPlayer : Player
 	private Dictionary<string, Unit> units = new Dictionary<string, Unit> ();
 	private Dictionary<string, Building> buildings = new Dictionary<string, Building> ();
 	private int unitCount = 0;
-	private int selectedUnitCount = 0;
 	private int buildingCount = 0;
 	private List<Unit> selectedUnitsList = new List<Unit>();
 
@@ -115,12 +114,6 @@ public class PersonPlayer : Player
 			}
 		} //If right click is pressed down, i.e. move order is made
 		else if (Input.GetMouseButtonDown (1)) {
-			//Creates move order based on mouse screen coordinates
-			Vector3 moveOrder = Input.mousePosition;
-			//Creates formation with units selected
-			//My dad thinks there should be a new "formation" class that gets made right now
-			// on the right mouse click. The formation code probably shouldn't be in person player.
-			// I just don't where else to put it.
 
 		/// ///////////////////////////////////////////////////////
 		/// Formations
@@ -248,7 +241,7 @@ public class PersonPlayer : Player
 			int unitSpace = 15;
 			if (formationName == "Square" || formationName == "Squared") {
 				float side = Mathf.Sqrt (numberUnits);
-				float middleSide = (side/2)*unitSpace;
+				//float middleSide = (side/2)*unitSpace;
 				foreach (Unit unit in selectedUnitsList) {
 					giveMoveOrder (movePosition, unit);
 					movePosition.x += unitSpace;
@@ -313,7 +306,6 @@ public class PersonPlayer : Player
 			}
 		}
 		//sets class variable to be used when necessary without high overhead. hopefully.
-		selectedUnitCount = selectedUnitsList.Count;
 		return selectedUnitsList.Count;
 	}
 }

@@ -74,6 +74,10 @@ public class Grid : MonoBehaviour {
 		return(grid [x, y]);
 	}
 
+	public Node NodeFromGridPoint(int x, int y){
+		return grid[x,y];
+	}
+
 	void OnDrawGizmos(){
 		Gizmos.DrawWireCube(transform.position,new Vector3(gridWorldSize.x,1,gridWorldSize.y));
 		Vector3 newVector = Vector3.one;
