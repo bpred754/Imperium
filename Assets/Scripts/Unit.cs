@@ -19,7 +19,7 @@ public class Unit : MonoBehaviour {
 	Vector3[] path;
 	int targetIndex;
 
-
+	
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
@@ -30,9 +30,8 @@ public class Unit : MonoBehaviour {
 		//testPosition = transform.position;
 		sphere = transform.FindChild ("Sphere");
 		sphere.GetComponent<Renderer> ().material.color = startColor;
+
 	}
-
-
 
 	/*********************************************************************************/
 	/*	Public Functions - Order: Alphabetic										 */		
@@ -52,7 +51,8 @@ public class Unit : MonoBehaviour {
 			targetIndex = 0;
 			
 			while(true){
-				if (transform.position.x == currentWaypoint.x && transform.position.z == currentWaypoint.z){
+				if (transform.position.x == currentWaypoint.x && transform.position.y == currentWaypoint.y && transform.position.z == currentWaypoint.z){
+					//Debug.Log(currentWaypoint.y);
 					targetIndex++;
 					if(targetIndex >= path.Length){
 						yield break;
@@ -60,10 +60,11 @@ public class Unit : MonoBehaviour {
 					currentWaypoint = path[targetIndex];
 				}
 
-				transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, movementSpeed * Time.deltaTime);
 				transform.LookAt(currentWaypoint);
+				transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, movementSpeed * Time.deltaTime);
 				yield return null;
 			}
+			transform.LookAt(transform.forward);
 		}
 	}
 

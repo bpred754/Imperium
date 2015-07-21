@@ -6,6 +6,9 @@ public class Grid : MonoBehaviour {
 
 	public bool displayGridGizmos;
 	public LayerMask unwalkableMask;
+	public LayerMask Floor;
+	public LayerMask Ground;
+	public LayerMask Ramp;
 	public Vector2 gridWorldSize;
 	public float nodeRadius;
 	Node[,] grid;
@@ -33,12 +36,28 @@ public class Grid : MonoBehaviour {
 	public void CreateGrid(){
 		grid = new Node[gridSizeX, gridSizeY];
 		Vector3 worldBottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
+		int floorNum = -1;
 
 		for (int x = 0; x < gridSizeX; x++) {
 			for (int y = 0; y < gridSizeY; y++) {
 				Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
-				bool walkable = !(Physics.CheckSphere(worldPoint,nodeRadius,unwalkableMask));
-				grid[x,y] = new Node(walkable,worldPoint,x,y);
+
+				bool testGround = (Physics.CheckSphere(worldPoint,nodeRadius,Ground));
+				bool testFloor = (Physics.CheckSphere(worldPoint,nodeRadius,Floor));
+				bool testRamp = (Physics.CheckSphere(worldPoint,nodeRadius,Ramp));
+				bool testObstacle = (Physics.CheckSphere(worldPoint,nodeRadius,unwalkableMask));
+				if(testObstacle){
+					floorNum = 0;
+				}else if(testRamp){
+					floorNum = 3;
+				}else if(testFloor){
+					floorNum = 2;
+				}else if(testGround){
+					floorNum = 1;
+				}
+				//print(floorNum);
+
+				grid[x,y] = new Node(floorNum,worldPoint,x,y);
 			}
 		}
 	}
@@ -86,8 +105,16 @@ public class Grid : MonoBehaviour {
 
 		if (grid != null && displayGridGizmos) {
 			foreach (Node node in grid){
-				Gizmos.color = (node.walkable)?Color.white:Color.red;
-				Gizmos.DrawCube(node.worldPosition, newVector);
+				if(node.floorNum == 0){
+					Gizmos.color = Color.red;
+				}else if(node.floorNum == 1){
+					Gizmos.color = Color.white;
+				}else if(node.floorNum == 2){
+					Gizmos.color = Color.blue;
+				}else if(node.floorNum == 3){
+					Gizmos.color = Color.green;
+				}
+					Gizmos.DrawCube(node.worldPosition, newVector);
 			}
 		}
 	}

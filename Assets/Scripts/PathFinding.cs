@@ -67,17 +67,25 @@ public class PathFinding : MonoBehaviour {
 					if (!neighbor.walkable || closedSet.Contains (neighbor)) {
 						continue;
 					}
+					if(currentNode.ramp && neighbor.ramp || //ramp to ramp
+					   currentNode.ramp && neighbor.floor || //ramp to floor
+					   currentNode.floor && neighbor.floor ||
+					   currentNode.floor && neighbor.ramp ||
+					   currentNode.ground && neighbor.ground ||
+					   currentNode.ground && neighbor.ramp ||
+					   currentNode.ramp && neighbor.ground){ //floor to floor
 
-					int newMovementCostToNeighbor = currentNode.gCost + GetDistance (currentNode, neighbor);
-					if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains (neighbor)) {
-						neighbor.gCost = newMovementCostToNeighbor;
-						neighbor.hCost = GetDistance (neighbor, targetNode);
-						neighbor.parent = currentNode;
-
-						if (!openSet.Contains (neighbor)) {
-							openSet.Add (neighbor);
-						}else{
-							openSet.UpdateItem(neighbor);
+						int newMovementCostToNeighbor = currentNode.gCost + GetDistance (currentNode, neighbor);
+						if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains (neighbor)) {
+							neighbor.gCost = newMovementCostToNeighbor;
+							neighbor.hCost = GetDistance (neighbor, targetNode);
+							neighbor.parent = currentNode;
+							
+							if (!openSet.Contains (neighbor)) {
+								openSet.Add (neighbor);
+							}else{
+								openSet.UpdateItem(neighbor);
+							}
 						}
 					}
 				}
@@ -107,6 +115,7 @@ public class PathFinding : MonoBehaviour {
 			Array.Reverse (waypoints);
 			//Debug.Log ("WayPoints Length: " + waypoints.Length);
 			if(waypoints.Length > 0 && !newTarget){
+				targetPosition.y = waypoints[waypoints.Length-1].y;
 				waypoints[waypoints.Length-1] = targetPosition;
 				return waypoints;
 			}else{
@@ -123,10 +132,24 @@ public class PathFinding : MonoBehaviour {
 		Vector2 directionOld = Vector2.zero;
 
 		for(int i = 1; i < path.Count; i ++){
+			if(path[i].floorNum == 1) //ground
+				path[i].worldPosition.y = 0.5f;
+			else if(path[i].floorNum == 2) //floor
+				path[i].worldPosition.y = 1.5f;
+			else if(path[i].floorNum == 3) //ramp
+				path[i].worldPosition.y = 1.0f;
+		}
+		for(int i = 1; i < path.Count; i ++){
 			Vector2 directionNew = new Vector2(path[i-1].gridX - path[i].gridX, path[i-1].gridY - path[i].gridY);
-			if(directionNew != directionOld){
+			if(i != path.Count-1){
+				if(directionNew != directionOld ||
+				   path[i].floorNum != path[i-1].floorNum ||
+				   path[i+1].floorNum != path[i].floorNum){
+					waypoints.Add (path[i].worldPosition);
+					//Debug.Log ("Pathfinding " + path[i].worldPosition.y);
+				}
+			}else
 				waypoints.Add (path[i].worldPosition);
-			}
 			directionOld = directionNew;
 		}
 		return waypoints.ToArray();
