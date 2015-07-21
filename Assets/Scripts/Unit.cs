@@ -55,6 +55,7 @@ public class Unit : MonoBehaviour {
 					//Debug.Log(currentWaypoint.y);
 					targetIndex++;
 					if(targetIndex >= path.Length){
+						transform.rotation = Quaternion.Euler(0,transform.eulerAngles.y,transform.eulerAngles.z);
 						yield break;
 					}
 					currentWaypoint = path[targetIndex];
@@ -64,7 +65,6 @@ public class Unit : MonoBehaviour {
 				transform.position = Vector3.MoveTowards(transform.position, currentWaypoint, movementSpeed * Time.deltaTime);
 				yield return null;
 			}
-			transform.LookAt(transform.forward);
 		}
 	}
 
