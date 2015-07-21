@@ -131,7 +131,7 @@ public class PathFinding : MonoBehaviour {
 		List<Vector3> waypoints = new List<Vector3>();
 		Vector2 directionOld = Vector2.zero;
 
-		for(int i = 1; i < path.Count; i ++){
+		for(int i = 0; i < path.Count; i ++){
 			if(path[i].floorNum == 1) //ground
 				path[i].worldPosition.y = 0.5f;
 			else if(path[i].floorNum == 2) //floor
@@ -139,6 +139,7 @@ public class PathFinding : MonoBehaviour {
 			else if(path[i].floorNum == 3) //ramp
 				path[i].worldPosition.y = 1.0f;
 		}
+		waypoints.Add (path[0].worldPosition);
 		for(int i = 1; i < path.Count; i ++){
 			Vector2 directionNew = new Vector2(path[i-1].gridX - path[i].gridX, path[i-1].gridY - path[i].gridY);
 			if(i != path.Count-1){

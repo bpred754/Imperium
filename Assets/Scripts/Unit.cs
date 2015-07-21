@@ -81,6 +81,7 @@ public class Unit : MonoBehaviour {
 	}
 
 	public void makeMove(Vector3 destination){ //Maybe should return bool, if unit cannot get to location return false?? otherwise true?
+		Debug.Log("Testing");
 		destination.y = transform.position.y;
 		PathRequestManager.RequestPath(transform.position, destination, OnPathFound);		
 	}

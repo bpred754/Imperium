@@ -234,8 +234,8 @@ public class PersonPlayer : Player
 
 	//Creates formation, takes string:formationName
 	private void createFormation(string formationName){
-		if(getNumUnitsSelected() > 0){
-			Vector3 mousePosition = Input.mousePosition;
+		Vector3 mousePosition = Input.mousePosition;
+		if(getNumUnitsSelected() > 1){
 			Vector3 movePosition = mousePosition;
 			int numberUnits = getNumUnitsSelected ();
 			int unitSpace = 15;
@@ -249,8 +249,6 @@ public class PersonPlayer : Player
 						movePosition.x = mousePosition.x;
 						movePosition.y -= unitSpace;
 					}
-					//loops through rings of hexagons
-					//first ring 1 unit, second ring 6 units, third ring 12 units, fourth ring 18 units
 				}
 			} else if (formationName == "Shell" || formationName == "Shelled") {
 				int circumference = unitSpace * numberUnits * 2;
@@ -259,34 +257,20 @@ public class PersonPlayer : Player
 				float radOffset = (degreeOffset * Mathf.PI) / 180;
 				float radianOffset = 0;
 
-				if (numberUnits == 1) {
-					foreach (Unit unit in selectedUnitsList) {
-						giveMoveOrder (movePosition, unit);
-					}
-				} else {
-					foreach (Unit unit in selectedUnitsList) {
-						movePosition = mousePosition;
-
-						movePosition.x += radius * Mathf.Sin (radianOffset);
-						movePosition.y += radius * Mathf.Cos (radianOffset);
-		
-						giveMoveOrder (movePosition, unit);
-
-						radianOffset += radOffset;
-					}
-				}
-			} else if (formationName == "V") {
-				int count = 0;
 				foreach (Unit unit in selectedUnitsList) {
-					count += 1;
-					if(count == 1){
-						giveMoveOrder (movePosition, unit);
-					} else if ((count % 2) == 1){//if odd
-						
-					} else {
+					movePosition = mousePosition;
 
-					}
+					movePosition.x += radius * Mathf.Sin (radianOffset);
+					movePosition.y += radius * Mathf.Cos (radianOffset);
+	
+					giveMoveOrder (movePosition, unit);
+
+					radianOffset += radOffset;
 				}
+			}
+		}else{
+			foreach (Unit unit in selectedUnitsList) {
+				giveMoveOrder (mousePosition, unit);
 			}
 		}
 	}
