@@ -9,6 +9,7 @@ public class PathFinding : MonoBehaviour {
 
 	Vector3 targetPosition;
 	bool newTarget = false;
+	int buildingHeight = 1;
 
 	Grid grid;
 
@@ -69,11 +70,11 @@ public class PathFinding : MonoBehaviour {
 					}
 					if(currentNode.ramp && neighbor.ramp || //ramp to ramp
 					   currentNode.ramp && neighbor.floor || //ramp to floor
-					   currentNode.floor && neighbor.floor ||
+					   currentNode.floor && neighbor.floor || 
 					   currentNode.floor && neighbor.ramp ||
 					   currentNode.ground && neighbor.ground ||
 					   currentNode.ground && neighbor.ramp ||
-					   currentNode.ramp && neighbor.ground){ //floor to floor
+					   currentNode.ramp && neighbor.ground){
 
 						int newMovementCostToNeighbor = currentNode.gCost + GetDistance (currentNode, neighbor);
 						if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains (neighbor)) {
@@ -135,9 +136,9 @@ public class PathFinding : MonoBehaviour {
 			if(path[i].floorNum == 1) //ground
 				path[i].worldPosition.y = 0.5f;
 			else if(path[i].floorNum == 2) //floor
-				path[i].worldPosition.y = 1.5f;
+				path[i].worldPosition.y = 2.5f * buildingHeight;
 			else if(path[i].floorNum == 3) //ramp
-				path[i].worldPosition.y = 1.0f;
+				path[i].worldPosition.y = 1.5f * buildingHeight;
 		}
 		waypoints.Add (path[0].worldPosition);
 		for(int i = 1; i < path.Count; i ++){
@@ -149,8 +150,8 @@ public class PathFinding : MonoBehaviour {
 					waypoints.Add (path[i].worldPosition);
 					//Debug.Log ("Pathfinding " + path[i].worldPosition.y);
 				}
-			}else
-				waypoints.Add (path[i].worldPosition);
+			}//else
+				//waypoints.Add (path[i].worldPosition);
 			directionOld = directionNew;
 		}
 		return waypoints.ToArray();

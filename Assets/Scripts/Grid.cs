@@ -9,6 +9,7 @@ public class Grid : MonoBehaviour {
 	public LayerMask Floor;
 	public LayerMask Ground;
 	public LayerMask Ramp;
+	public LayerMask Unit;
 	public Vector2 gridWorldSize;
 	public float nodeRadius;
 	Node[,] grid;
@@ -46,6 +47,7 @@ public class Grid : MonoBehaviour {
 				bool testFloor = (Physics.CheckSphere(worldPoint,nodeRadius,Floor));
 				bool testRamp = (Physics.CheckSphere(worldPoint,nodeRadius,Ramp));
 				bool testObstacle = (Physics.CheckSphere(worldPoint,nodeRadius,unwalkableMask));
+
 				if(testObstacle){
 					floorNum = 0;
 				}else if(testRamp){
@@ -105,14 +107,14 @@ public class Grid : MonoBehaviour {
 
 		if (grid != null && displayGridGizmos) {
 			foreach (Node node in grid){
-				if(node.floorNum == 0){
-					Gizmos.color = Color.red;
-				}else if(node.floorNum == 1){
-					Gizmos.color = Color.white;
+				if(node.floorNum == 3){
+					Gizmos.color = Color.green;
 				}else if(node.floorNum == 2){
 					Gizmos.color = Color.blue;
-				}else if(node.floorNum == 3){
-					Gizmos.color = Color.green;
+				}else if(node.floorNum == 1){
+					Gizmos.color = Color.white;
+				}else if(node.floorNum == 0){
+					Gizmos.color = Color.red;
 				}
 					Gizmos.DrawCube(node.worldPosition, newVector);
 			}
