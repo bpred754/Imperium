@@ -20,6 +20,8 @@ public class PersonPlayer : Player
 	private int buildingCount = 0;
 	private List<Unit> selectedUnitsList = new List<Unit>();
 
+	LayerMask layer;
+
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
@@ -119,8 +121,16 @@ public class PersonPlayer : Player
 		/// Formations
 		/// ///////////////////////////////////////////////////////
 
-			//createFormation ("Square");
-			createFormation("Shell");
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			RaycastHit hit;
+			// Casts the ray and get the first game object hit
+			Physics.Raycast(ray, out hit);
+			layer = hit.collider.gameObject.layer;
+			//Debug.Log("This hit at " + layer.value);
+			//if(collision.collider.gameObject.layer == LayerMask.NameToLayer("LAYER_NAME"))
+			createFormation("Shell", Input.mousePosition);
+			//createFormation("Square", Input.mousePosition);
+
 		}
 	}
 
@@ -171,19 +181,13 @@ public class PersonPlayer : Player
 	}
 	//Takes a unit and a move order and moves unit to that location
 	private void giveMoveOrder(Vector3 moveOrder, Unit unit){
-		//Sets z to current camera height, this needs to be updated for varying heights of camera
-		moveOrder.z = 28;
-		//Debug.Log ("moveOrder1: " + moveOrder.ToString());
-		//Converts screen coordinates of move order to world coordinates
-		moveOrder = Camera.main.ScreenToWorldPoint(moveOrder);
-		moveOrder.y = unit.transform.position.y;
-		//Y gets set to zero because they aren't moving in that direction at all
-		//Mouse height somtimes changes depending on where you click so this is necessary
-		//moveOrder.y = 0;
-		//Debug.Log ("moveOrder2: " + moveOrder.ToString());
-		//Commits move order in unit class.
-
-		unit.makeMove(moveOrder);
+		Ray ray = Camera.main.ScreenPointToRay(moveOrder);
+		RaycastHit hit;
+		// Casts the ray and get the first game object hit
+		Physics.Raycast(ray, out hit);
+		//Move order equals the point the ray hit a collider
+		moveOrder = hit.point;
+		unit.makeMove(moveOrder, layer);
 	}
 	
 	// Inverts the Y component of the mouse vector
@@ -194,7 +198,7 @@ public class PersonPlayer : Player
 	
 	// Executes logic when the user moves the camera
 	private void moveCamera() {
-		int screenScrollLimit = 100;
+		int screenScrollLimit = Screen.height / 7;
 		float scrollRate = 0.4f;
 		Vector3 movementVectorX;
 		Vector3 movementVectorZ;
@@ -233,8 +237,7 @@ public class PersonPlayer : Player
 	}
 
 	//Creates formation, takes string:formationName
-	private void createFormation(string formationName){
-		Vector3 mousePosition = Input.mousePosition;
+	private void createFormation(string formationName, Vector3 mousePosition){
 		if(getNumUnitsSelected() > 1){
 			Vector3 movePosition = mousePosition;
 			int numberUnits = getNumUnitsSelected ();
@@ -268,7 +271,7 @@ public class PersonPlayer : Player
 					radianOffset += radOffset;
 				}
 			}
-		}else{
+		}else{ //If only one unit is selected
 			foreach (Unit unit in selectedUnitsList) {
 				giveMoveOrder (mousePosition, unit);
 			}

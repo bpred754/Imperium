@@ -34,7 +34,7 @@ public class Building : MonoBehaviour
 	}
 
 	private void Start() {
-		gameObject.layer = LayerMask.NameToLayer ("Unwalkable");
+		gameObject.layer = LayerMask.NameToLayer ("Floor");
 	}
 
 	private void OnMouseDown() {

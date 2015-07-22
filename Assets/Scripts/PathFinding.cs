@@ -18,11 +18,11 @@ public class PathFinding : MonoBehaviour {
 		grid = GetComponent<Grid>();
 	}
 
-	public void StartFindPath(Vector3 startPos, Vector3 targetPos){
-		StartCoroutine(FindPath (startPos,targetPos));
+	public void StartFindPath(Vector3 startPos, Vector3 targetPos, LayerMask layer){
+		StartCoroutine(FindPath (startPos,targetPos, layer));
 	}
 
-	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos){
+	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, LayerMask layer){
 
 		Vector3[] wayPoints = new Vector3[0];
 		bool pathSuccess = false;
@@ -68,13 +68,7 @@ public class PathFinding : MonoBehaviour {
 					if (!neighbor.walkable || closedSet.Contains (neighbor)) {
 						continue;
 					}
-					if(currentNode.ramp && neighbor.ramp || //ramp to ramp
-					   currentNode.ramp && neighbor.floor || //ramp to floor
-					   currentNode.floor && neighbor.floor || 
-					   currentNode.floor && neighbor.ramp ||
-					   currentNode.ground && neighbor.ground ||
-					   currentNode.ground && neighbor.ramp ||
-					   currentNode.ramp && neighbor.ground){
+					if(IsLegalMove(currentNode,neighbor)){
 
 						int newMovementCostToNeighbor = currentNode.gCost + GetDistance (currentNode, neighbor);
 						if (newMovementCostToNeighbor < neighbor.gCost || !openSet.Contains (neighbor)) {
@@ -103,6 +97,21 @@ public class PathFinding : MonoBehaviour {
 		}
 	}
 
+	bool IsLegalMove(Node current, Node neighbor){
+		if (current.ramp && neighbor.ramp || //ramp to ramp
+			current.ramp && neighbor.floor || //ramp to floor
+			current.floor && neighbor.floor || 
+			current.floor && neighbor.ramp ||
+			current.ground && neighbor.ground ||
+			current.ground && neighbor.ramp ||
+			current.ramp && neighbor.ground) {
+			return true;
+		} else {
+			return false;
+		}
+
+	}
+	
 	Vector3[] RetracePath(Node startNode, Node endNode){
 		List<Node> path = new List<Node>();
 		Node currentNode = endNode;

@@ -48,13 +48,13 @@ public class Grid : MonoBehaviour {
 				bool testRamp = (Physics.CheckSphere(worldPoint,nodeRadius,Ramp));
 				bool testObstacle = (Physics.CheckSphere(worldPoint,nodeRadius,unwalkableMask));
 
-				if(testObstacle){
+				if(testObstacle){ // obstacle
 					floorNum = 0;
-				}else if(testRamp){
+				}else if(testRamp){ //ramp
 					floorNum = 3;
-				}else if(testFloor){
+				}else if(testFloor){ //second floor
 					floorNum = 2;
-				}else if(testGround){
+				}else if(testGround){ //ground floor
 					floorNum = 1;
 				}
 				//print(floorNum);

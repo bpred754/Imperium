@@ -18,7 +18,6 @@ public class Unit : MonoBehaviour {
 
 	Vector3[] path;
 	int targetIndex;
-
 	
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
@@ -80,9 +79,9 @@ public class Unit : MonoBehaviour {
 		return GetComponent<Renderer> ().isVisible;
 	}
 
-	public void makeMove(Vector3 destination){ //Maybe should return bool, if unit cannot get to location return false?? otherwise true?
+	public void makeMove(Vector3 destination, LayerMask layer){ //Maybe should return bool, if unit cannot get to location return false?? otherwise true?
 		destination.y = transform.position.y;
-		PathRequestManager.RequestPath(transform.position, destination, OnPathFound);		
+		PathRequestManager.RequestPath(transform.position, destination, OnPathFound, layer);		
 	}
 
 	/*********************************************************************************/
