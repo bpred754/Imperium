@@ -168,16 +168,6 @@ public class PersonPlayer : Player
 				}
 			}
 		}
-
-		// Loop through buildings and select the buildings that are in selection area
-		/*foreach(KeyValuePair<string,Building> entry in buildings) {
-			Building building = entry.Value;
-			if(building.isVisible() && Input.GetMouseButton(0)) {
-				Vector3 camPos = Camera.main.WorldToScreenPoint(building.transform.position);
-				camPos.y = InvertMouseY(camPos.y);
-				building.setSelected(selection.Contains(camPos));
-			}			
-		}*/
 	}
 	//Takes a unit and a move order and moves unit to that location
 	private void giveMoveOrder(Vector3 moveOrder, Unit unit){
@@ -185,9 +175,8 @@ public class PersonPlayer : Player
 		RaycastHit hit;
 		// Casts the ray and get the first game object hit
 		Physics.Raycast(ray, out hit);
-		//Move order equals the point the ray hit a collider
-		moveOrder = hit.point;
-		unit.makeMove(moveOrder, layer);
+
+		unit.makeMove(hit);
 	}
 	
 	// Inverts the Y component of the mouse vector

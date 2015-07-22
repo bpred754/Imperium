@@ -18,18 +18,18 @@ public class PathFinding : MonoBehaviour {
 		grid = GetComponent<Grid>();
 	}
 
-	public void StartFindPath(Vector3 startPos, Vector3 targetPos, LayerMask layer){
-		StartCoroutine(FindPath (startPos,targetPos, layer));
+	public void StartFindPath(Vector3 startPos, RaycastHit targetPos){
+		StartCoroutine(FindPath (startPos,targetPos));
 	}
 
-	IEnumerator FindPath(Vector3 startPos, Vector3 targetPos, LayerMask layer){
+	IEnumerator FindPath(Vector3 startPos, RaycastHit targetPos){
 
 		Vector3[] wayPoints = new Vector3[0];
 		bool pathSuccess = false;
-		targetPosition = targetPos;
+		targetPosition = targetPos.point;
 
 		Node startNode = grid.NodeFromWorldPoint(startPos);
-		Node targetNode = grid.NodeFromWorldPoint(targetPos);
+		Node targetNode = grid.NodeFromWorldPoint(targetPosition);
 		newTarget = false;
 
 		//This one doesn't let units move if they are currently on an unwalkable square
@@ -149,6 +149,7 @@ public class PathFinding : MonoBehaviour {
 			else if(path[i].floorNum == 3) //ramp
 				path[i].worldPosition.y = 1.5f * buildingHeight;
 		}
+
 		waypoints.Add (path[0].worldPosition);
 		for(int i = 1; i < path.Count; i ++){
 			Vector2 directionNew = new Vector2(path[i-1].gridX - path[i].gridX, path[i-1].gridY - path[i].gridY);
