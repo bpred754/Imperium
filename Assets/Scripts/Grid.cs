@@ -56,6 +56,8 @@ public class Grid : MonoBehaviour {
 					floorNum = 2;
 				}else if(testGround){ //ground floor
 					floorNum = 1;
+				}else{
+					floorNum = -1;
 				}
 				//print(floorNum);
 
@@ -115,6 +117,8 @@ public class Grid : MonoBehaviour {
 					Gizmos.color = Color.white;
 				}else if(node.floorNum == 0){
 					Gizmos.color = Color.red;
+				}else{
+					Gizmos.color = Color.clear;
 				}
 					Gizmos.DrawCube(node.worldPosition, newVector);
 			}
