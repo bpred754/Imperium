@@ -12,27 +12,29 @@ public class Grid : MonoBehaviour {
 	public LayerMask Unit;
 	public Vector2 gridWorldSize;
 	public float nodeRadius;
-	Node[,] grid;
 
-	float nodeDiameter;
-	int gridSizeX, gridSizeY;
+	private Node[,] grid;
+	private float nodeDiameter;
+	private int gridSizeX, gridSizeY;
 
-	void Awake(){
+	/*********************************************************************************/
+	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
+	/*********************************************************************************/
+
+	public void Awake(){
 		nodeDiameter = nodeRadius * 2;
 		gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
 		gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
 		CreateGrid ();
 	}
 
-	void Update(){
+	public void Update(){
 		CreateGrid ();
 	}
 
-	public int MaxSize{
-		get{
-			return gridSizeX * gridSizeY;
-		}
-	}
+	/*********************************************************************************/
+	/*	Public Functions - Order: Alphabetic										 */		
+	/*********************************************************************************/	
 
 	public void CreateGrid(){
 		grid = new Node[gridSizeX, gridSizeY];
@@ -59,11 +61,14 @@ public class Grid : MonoBehaviour {
 				}else{
 					floorNum = -1;
 				}
-				//print(floorNum);
 
 				grid[x,y] = new Node(floorNum,worldPoint,x,y);
 			}
 		}
+	}
+
+	public int getMaxSize() {
+		return gridSizeX * gridSizeY;
 	}
 
 	public List<Node> GetNeighbors(Node node){
@@ -73,8 +78,8 @@ public class Grid : MonoBehaviour {
 			for(int y = -1; y <= 1; y++){
 				if(x == 0 && y == 0)
 					continue;
-				int checkX = node.gridX + x;
-				int checkY = node.gridY + y;
+				int checkX = node.getGridX() + x;
+				int checkY = node.getGridY() + y;
 
 				if (checkX >= 0 && checkX < gridSizeX && checkY >= 0 && checkY < gridSizeY){
 					neighbors.Add(grid[checkX,checkY]);
@@ -83,6 +88,10 @@ public class Grid : MonoBehaviour {
 		}
 
 		return neighbors;
+	}
+
+	public Node NodeFromGridPoint(int x, int y){
+		return grid[x,y];
 	}
 
 	public Node NodeFromWorldPoint(Vector4 worldPosition){
@@ -95,10 +104,6 @@ public class Grid : MonoBehaviour {
 		int y = Mathf.RoundToInt((gridSizeY - 1) * percentY);
 
 		return(grid [x, y]);
-	}
-
-	public Node NodeFromGridPoint(int x, int y){
-		return grid[x,y];
 	}
 
 	/*********************************************************************************/
@@ -117,18 +122,18 @@ public class Grid : MonoBehaviour {
 
 		if (grid != null && displayGridGizmos) {
 			foreach (Node node in grid){
-				if(node.floorNum == 3){
+				if(node.getFloorNum() == 3){
 					Gizmos.color = Color.green;
-				}else if(node.floorNum == 2){
+				}else if(node.getFloorNum() == 2){
 					Gizmos.color = Color.blue;
-				}else if(node.floorNum == 1){
+				}else if(node.getFloorNum() == 1){
 					Gizmos.color = Color.white;
-				}else if(node.floorNum == 0){
+				}else if(node.getFloorNum() == 0){
 					Gizmos.color = Color.red;
 				}else{
 					Gizmos.color = Color.clear;
 				}
-					Gizmos.DrawCube(node.worldPosition, newVector);
+					Gizmos.DrawCube(node.getWorldPosition(), newVector);
 			}
 		}
 	}

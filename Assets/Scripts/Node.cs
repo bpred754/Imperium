@@ -3,22 +3,21 @@ using System.Collections;
 
 public class Node : IHeapItem<Node>{
 
-	public bool walkable;
-	public Vector3 worldPosition;
-	public int gridX;
-	public int gridY;
+	private Node parent;
+	private Vector3 worldPosition;
+	private int gridX;
+	private int gridY;
+	private int gCost;
+	private int hCost;
+	private int heapIndex;
+	private int floorNum;
+	private bool walkable;
+	private bool ramp = false;
+	private bool ground = false;
+	private bool floor = false;
+	private bool obstacle = false;
 
-	public int gCost;
-	public int hCost;
-	public Node parent;
-	int heapIndex;
-
-	public int floorNum;
-	public bool ramp = false;
-	public bool ground = false;
-	public bool floor = false;
-	public bool obstacle = false;
-
+	// Constructor
 	public Node(int floorNum, Vector3 worldPosition, int gridX, int gridY){
 		this.floorNum = floorNum;
 		if(floorNum == 0){
@@ -40,26 +39,91 @@ public class Node : IHeapItem<Node>{
 		this.gridY = gridY;
 	}
 
-	public int fCost{
-		get{
-			return gCost + hCost;
-		}
-	}
-
-	public int HeapIndex{
-		get{
-			return heapIndex;
-		}
-		set{
-			heapIndex = value;
-		}
-	}
+	/*********************************************************************************/
+	/*	Public Functions - Order: Alphabetic										 */		
+	/*********************************************************************************/
 
 	public int CompareTo(Node nodeToCompare){
-		int compare = fCost.CompareTo(nodeToCompare.fCost);
+		int compare = this.getFCost().CompareTo(nodeToCompare.getFCost());
 		if(compare == 0){
 			compare = hCost.CompareTo(nodeToCompare.hCost);
 		}
 		return -compare;
+	}
+
+	public int getFCost() {
+		return gCost + hCost;
+	}
+
+	/*********************************************************************************/
+	/*	Getter and Setter Functions - Order: Alphabetic							 	 */		
+	/*********************************************************************************/
+
+	public int getFloorNum() {
+		return this.floorNum;
+	}
+
+	public int getGCost() {
+		return this.gCost;
+	}
+
+	public int getGridX() {
+		return this.gridX;
+	}
+
+	public int getGridY() {
+		return this.gridY;
+	}
+
+	public int getHCost() {
+		return this.hCost;
+	}
+
+	public int getHeapIndex() {
+		return this.heapIndex;
+	}
+
+	public Node getParent() {
+		return this.parent;
+	}
+
+	public Vector3 getWorldPosition() {
+		return this.worldPosition;
+	}
+
+	public bool isFloor() {
+		return this.floor;
+	}
+
+	public bool isGround() {
+		return this.ground;
+	}
+
+	public bool isRamp() {
+		return this.ramp;
+	}
+
+	public bool isWalkable() {
+		return this.walkable;
+	}
+
+	public void setGCost(int _gCost) {
+		this.gCost = _gCost;
+	}
+
+	public void setHCost(int _hCost) {
+		this.hCost = _hCost;
+	}
+	
+	public void setHeapIndex(int _heapIndex) {
+		this.heapIndex = _heapIndex;
+	}
+
+	public void setParent(Node _parent) {
+		this.parent = _parent;
+	}
+
+	public void setWorldPosition(Vector3 _worldPosition) {
+		this.worldPosition = _worldPosition; 
 	}
 }

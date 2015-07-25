@@ -5,49 +5,46 @@ using System;
 
 public class PathRequestManager : MonoBehaviour {
 	
-	Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
-	PathRequest currentPathRequest;
-	
-	static PathRequestManager instance;
-	PathFinding pathfinding;
-	
-	bool isProcessingPath;
+	private Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
+	private PathRequest currentPathRequest;
+	private static PathRequestManager instance;
+	private PathFinding pathfinding;
+	private bool isProcessingPath;
+
+	/*********************************************************************************/
+	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
+	/*********************************************************************************/
 	
 	void Awake() {
 		instance = this;
 		pathfinding = GetComponent<PathFinding>();
 	}
+
+	/*********************************************************************************/
+	/*	Public Functions - Order: Alphabetic										 */		
+	/*********************************************************************************/	
 	
+	public void FinishedProcessingPath(Vector3[] path, bool success) {
+		currentPathRequest.executeCallback(path,success);
+		isProcessingPath = false;
+		TryProcessNext();
+	}
+
 	public static void RequestPath(Vector3 pathStart, RaycastHit pathEnd, Action<Vector3[], bool> callback) {
 		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback);
 		instance.pathRequestQueue.Enqueue(newRequest);
 		instance.TryProcessNext();
 	}
+
+	/*********************************************************************************/
+	/*	Private Functions - Order: Alphabetic										 */		
+	/*********************************************************************************/
 	
-	void TryProcessNext() {
+	private void TryProcessNext() {
 		if (!isProcessingPath && pathRequestQueue.Count > 0) {
 			currentPathRequest = pathRequestQueue.Dequeue();
 			isProcessingPath = true;
-			pathfinding.StartFindPath(currentPathRequest.pathStart, currentPathRequest.pathEnd);
+			pathfinding.StartFindPath(currentPathRequest.getPathStart(), currentPathRequest.getPathEnd());
 		}
-	}
-	
-	public void FinishedProcessingPath(Vector3[] path, bool success) {
-		currentPathRequest.callback(path,success);
-		isProcessingPath = false;
-		TryProcessNext();
-	}
-	
-	struct PathRequest {
-		public Vector3 pathStart;
-		public RaycastHit pathEnd;
-		public Action<Vector3[], bool> callback;
-		
-		public PathRequest(Vector3 _start, RaycastHit _end, Action<Vector3[], bool> _callback) {
-			pathStart = _start;
-			pathEnd = _end;
-			callback = _callback;
-		}
-		
 	}
 }

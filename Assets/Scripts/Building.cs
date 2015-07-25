@@ -18,9 +18,7 @@ public class Building : MonoBehaviour
 	private int unitCount = 0;
 	private Vector3 position;
 	private KeyValuePair<Vector3,bool>[] availablePositions = new KeyValuePair<Vector3,bool>[12];
-	int buildingNum;
-
-	Grid grid;
+	private int buildingNum;
 
 	// Model variables
 	private Color startColor = new Color(0,1f,0);
@@ -29,17 +27,8 @@ public class Building : MonoBehaviour
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
 
-	void Awake(){
-		grid = GetComponent<Grid>();
-	}
-
 	private void Start() {
-		gameObject.layer = LayerMask.NameToLayer ("Floor");
-	}
-
-	private void OnMouseDown() {
-		//Debug.Log("Building Selected");
-		//setSelected (!isSelected);
+		this.gameObject.layer = LayerMask.NameToLayer ("Floor");
 	}
 
 	/*********************************************************************************/
@@ -75,7 +64,6 @@ public class Building : MonoBehaviour
 				}
 			}
 		}
-		//grid.CreateGrid ();
 	}
 
 	public bool isTeam(Team inTeam) {
@@ -89,7 +77,6 @@ public class Building : MonoBehaviour
 	public bool isVisible() {
 		return GetComponent<Renderer> ().isVisible;
 	}
-
 
 	/*********************************************************************************/
 	/*	Getter and Setter Functions - Order: Alphabetic							 	 */		
