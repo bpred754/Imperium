@@ -30,6 +30,9 @@ public class Game : MonoBehaviour {
 		float minWorldZ = groundPosition.z - groundSize.z/2;
 
 		this.player.setCameraBoundaries (maxWorldX, minWorldX, maxWorldZ, minWorldZ);
+
+		Grid grid = GetComponentInParent<Grid> ();
+		this.player.setGrid (grid);
 	}
 	
 	// Update is called once per frame

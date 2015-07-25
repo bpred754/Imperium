@@ -13,7 +13,6 @@ public class PersonPlayer : Player
 	public Texture2D selectionHighlight;
 	public Building building; // Prefab (Building)
 
-
 	// Logic variables
 	private Camera camera;
 	private Vector3 startClick = -Vector3.one; 
@@ -87,6 +86,13 @@ public class PersonPlayer : Player
 		// Add unit List to prefab
 		GameObject unitList = (GameObject)Instantiate(unitListPrefab);
 		unitList.transform.SetParent(canvas.transform, false);
+		Button[] unitListButtons = unitList.GetComponentsInChildren<Button>();
+		Button unitButton0 = unitListButtons [0];
+		unitButton0.onClick.RemoveAllListeners();
+		unitButton0.onClick.AddListener (() => toggleGridGizmos(unitButton0));
+		Button unitButton1 = unitListButtons[1];
+		unitButton1.onClick.RemoveAllListeners();
+		unitButton1.onClick.AddListener (() => toggleWayPointGizmos(unitButton1));
 		unitList.SetActive(false);
 		
 		// Add listeners to tabs
@@ -96,7 +102,7 @@ public class PersonPlayer : Player
 		unitsTab.onClick.RemoveAllListeners();
 		unitsTab.onClick.AddListener(() => unitTabListener (buildingsTab, unitsTab, buildingList, unitList));
 		
-		// TODO: Add building/unit listing button listeners
+		// TODO: Add building listing button listeners
 
 		// Set GUI width variable
 		RectTransform tabTransform = tabs.GetComponent<RectTransform>();
@@ -173,6 +179,9 @@ public class PersonPlayer : Player
 					if (newUnit != null) {
 						units.Add (newUnit.name, newUnit);
 						unitCount++;
+
+						// DEBUG
+						newUnit.setDisplayWayPointGizmos(false);
 					}
 				}
 				
@@ -405,7 +414,7 @@ public class PersonPlayer : Player
 		Text tabText = tab.GetComponentInChildren<Text> ();
 		tabText.color = Color.white;
 	}
-	
+
 	private void unitTabListener (Button buildingTab, Button unitTab, GameObject buildingList, GameObject unitList) {
 		
 		// Deactivate Buildings listing prefab
@@ -427,6 +436,67 @@ public class PersonPlayer : Player
 		
 		Text tabText = tab.GetComponentInChildren<Text> ();
 		tabText.color = Color.black;
+	}
+
+	/*********************************************************************************/
+	/*	DEBUG Functions - Order: Alphabetic							 	             */		
+	/*********************************************************************************/
+
+	private bool displayWayPointGizmos = false;
+	private Grid grid;
+
+	private void selectButton(Button button) {
+		var selectedColor = button.colors;
+		selectedColor.normalColor =  Color.green;
+		selectedColor.pressedColor = Color.green;
+		selectedColor.highlightedColor = Color.green;
+		selectedColor.disabledColor = Color.green;
+		button.colors = selectedColor;
+	}
+
+	public void setGrid(Grid inGrid) {
+		this.grid = inGrid;
+	}
+
+	private void toggleGridGizmos(Button button) {
+		
+		if (grid.getDisplayGridGizmos()) {
+			unselectButton(button);
+			grid.setDisplayGridGizmos(false);
+		} else {
+			selectButton(button);
+			grid.setDisplayGridGizmos(true);
+		}
+	}
+	
+	private void toggleWayPointGizmos(Button button) {
+		
+		this.displayWayPointGizmos = !this.displayWayPointGizmos;
+		
+		foreach (KeyValuePair<string,Unit> entry in units) {
+			Unit unit = entry.Value;
+			
+			if (this.displayWayPointGizmos && !unit.getDisplayWayPointGizmos ()) {
+				unit.setDisplayWayPointGizmos (true);
+			} else if (!this.displayWayPointGizmos && unit.getDisplayWayPointGizmos()) {
+				unit.setDisplayWayPointGizmos(false);
+			}
+		}
+		
+		if (this.displayWayPointGizmos) {
+			selectButton (button);
+		} else {
+			unselectButton(button);
+		}
+	}
+
+	private void unselectButton(Button button) {
+		var selectedColor = button.colors;
+		selectedColor.normalColor = Color.white;
+		selectedColor.pressedColor = Color.white;
+		selectedColor.highlightedColor = Color.white;
+		selectedColor.disabledColor = Color.white;
+		button.colors = selectedColor;
 	}
 }
 

@@ -101,6 +101,14 @@ public class Grid : MonoBehaviour {
 		return grid[x,y];
 	}
 
+	/*********************************************************************************/
+	/*	DEBUG Function - Order: Alphabetic							 	             */		
+	/*********************************************************************************/
+	
+	public bool getDisplayGridGizmos() {
+		return this.displayGridGizmos;
+	}
+
 	void OnDrawGizmos(){
 		Gizmos.DrawWireCube(transform.position,new Vector3(gridWorldSize.x,1,gridWorldSize.y));
 		Vector3 newVector = Vector3.one;
@@ -123,5 +131,9 @@ public class Grid : MonoBehaviour {
 					Gizmos.DrawCube(node.worldPosition, newVector);
 			}
 		}
+	}
+
+	public void setDisplayGridGizmos(bool willDisplayGridGizmos) {
+		this.displayGridGizmos = willDisplayGridGizmos;
 	}
 }

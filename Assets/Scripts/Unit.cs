@@ -107,6 +107,14 @@ public class Unit : MonoBehaviour {
 		this.team = inTeam;
 	}
 
+	/*********************************************************************************/
+	/*	DEBUG Function - Order: Alphabetic							 	             */		
+	/*********************************************************************************/
+
+	public bool getDisplayWayPointGizmos() {
+		return this.displayWayPointGizmos;
+	}
+
 	public void OnDrawGizmos() {
 		if (displayWayPointGizmos) {
 			if (path != null) {
@@ -122,5 +130,9 @@ public class Unit : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	public void setDisplayWayPointGizmos(bool willDisplayWayPointGizmos) {
+		this.displayWayPointGizmos = willDisplayWayPointGizmos;
 	}
 }
