@@ -14,4 +14,4 @@
 4. All scene additions are in code
 5. All methods are in alphabetic order
 6. All methods start with capital letter
-7. Update GitHib Issues/Tasks
+7. Update GitHub Issues/Tasks
