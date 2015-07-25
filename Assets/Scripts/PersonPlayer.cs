@@ -1,6 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class PersonPlayer : Player
 {
@@ -11,7 +13,9 @@ public class PersonPlayer : Player
 	public Texture2D selectionHighlight;
 	public Building building; // Prefab (Building)
 
+
 	// Logic variables
+	private Camera camera;
 	private Vector3 startClick = -Vector3.one; 
 	private Rect selection = new Rect (0,0,0,0);
 	private Dictionary<string, Unit> units = new Dictionary<string, Unit> ();
@@ -19,15 +23,90 @@ public class PersonPlayer : Player
 	private int unitCount = 0;
 	private int buildingCount = 0;
 	private List<Unit> selectedUnitsList = new List<Unit>();
+	private float maxWorldX = 0;
+	private float minWorldX = 0;
+	private float maxWorldZ = 0;
+	private float minWorldZ = 0;
+	private LayerMask layer;
 
-	LayerMask layer;
+	// GUI Prefabs
+	private GameObject minimapPrefab;
+	private GameObject tabsPrefab;
+	private GameObject buildingListPrefab;
+	private GameObject unitListPrefab;
+
+	// GUI variables
+	private float guiScreenWidth = 0;
+	private float guiWorldWidth = 0;
 
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
 
 	// Called when PersonPlayer is instantiated
-	private void Start() {}
+	private void Start() {
+
+		// Load Resources
+		minimapPrefab = Resources.Load<GameObject> ("MiniMap");
+		tabsPrefab = Resources.Load<GameObject> ("GUITabs");
+		buildingListPrefab = Resources.Load<GameObject> ("GUIBuildingList");
+		unitListPrefab = Resources.Load<GameObject> ("GUIUnitList");
+
+		camera = GetComponent<Camera> ();
+
+		// Add Event System to scene
+		if (FindObjectOfType<EventSystem>() == null)
+		{
+			GameObject es = new GameObject("EventSystem", typeof(EventSystem));
+			es.AddComponent<StandaloneInputModule>();
+		}
+		
+		// Add canvas to scene
+		var canvasObject = new GameObject("Canvas");
+		var canvas = canvasObject.AddComponent<Canvas>();
+		canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+		var graphicRayCaster = canvasObject.AddComponent<GraphicRaycaster> ();
+		
+		// Add minimap to canvas
+		GameObject minimap = (GameObject)Instantiate(minimapPrefab);
+		minimap.transform.SetParent(canvas.transform, false);
+		
+		// Add tabs to canvas
+		GameObject tabs = (GameObject)Instantiate(tabsPrefab);
+		tabs.transform.SetParent(canvas.transform, false);
+		Button buildingsTab = GameObject.Find ("BuildingsTab").GetComponentInChildren<Button>();
+		Button unitsTab = GameObject.Find ("UnitsTab").GetComponentInChildren<Button>();
+		selectTab (buildingsTab);
+		unselectTab (unitsTab);
+
+		// Add buildingList to prefab
+		GameObject buildingList = (GameObject)Instantiate(buildingListPrefab);
+		buildingList.transform.SetParent(canvas.transform, false);
+		buildingList.SetActive(true);
+
+		// Add unit List to prefab
+		GameObject unitList = (GameObject)Instantiate(unitListPrefab);
+		unitList.transform.SetParent(canvas.transform, false);
+		unitList.SetActive(false);
+		
+		// Add listeners to tabs
+		buildingsTab.onClick.RemoveAllListeners ();
+		buildingsTab.onClick.AddListener (() => buildingsTabListener(buildingsTab, unitsTab, buildingList, unitList));
+		
+		unitsTab.onClick.RemoveAllListeners();
+		unitsTab.onClick.AddListener(() => unitTabListener (buildingsTab, unitsTab, buildingList, unitList));
+		
+		// TODO: Add building/unit listing button listeners
+
+		// Set GUI width variable
+		RectTransform tabTransform = tabs.GetComponent<RectTransform>();
+		this.guiScreenWidth = tabTransform.rect.width;
+
+		// Set GUI world width variable
+		float left = camera.ScreenToWorldPoint (new Vector3(0,0, 27.66f)).x;
+		float right = camera.ScreenToWorldPoint (new Vector3(90,0, 27.66f)).x;
+		this.guiWorldWidth = right - left;
+	}
 
 	// Called every frame
 	private void Update() {
@@ -58,8 +137,15 @@ public class PersonPlayer : Player
 		buildingCount++;
 	}
 
+	public void setCameraBoundaries(float maxX, float minX, float maxZ, float minZ) {
+		this.maxWorldX = maxX;
+		this.minWorldX = minX;
+		this.maxWorldZ = maxZ;
+		this.minWorldZ = minZ;
+	}
+
 	/*********************************************************************************/
-	/*	Private Functions - Order: Alphabetic							 			 */		
+	/*	Private Logic Functions - Order: Alphabetic							 	     */		
 	/*********************************************************************************/
 
 	// Executes logic when user clicks
@@ -78,6 +164,7 @@ public class PersonPlayer : Player
 				Debug.Log ("Tag = " + hit.collider.tag);
 				Debug.Log ("Hit Point = " + hit.point);
 				Debug.Log ("Object position = " + hit.collider.gameObject.transform.position);
+				Debug.Log ("Object bounds = " + hit.collider.bounds.size);
 				Debug.Log ("--------------");*/
 
 				// If building is clicked create new unit
@@ -117,20 +204,14 @@ public class PersonPlayer : Player
 		} //If right click is pressed down, i.e. move order is made
 		else if (Input.GetMouseButtonDown (1)) {
 
-		/// ///////////////////////////////////////////////////////
-		/// Formations
-		/// ///////////////////////////////////////////////////////
-
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			// Formations
 			RaycastHit hit;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
 			// Casts the ray and get the first game object hit
 			Physics.Raycast(ray, out hit);
 			layer = hit.collider.gameObject.layer;
-			//Debug.Log("This hit at " + layer.value);
-			//if(collision.collider.gameObject.layer == LayerMask.NameToLayer("LAYER_NAME"))
 			createFormation("Shell", Input.mousePosition);
-			//createFormation("Square", Input.mousePosition);
-
 		}
 	}
 
@@ -168,63 +249,18 @@ public class PersonPlayer : Player
 				}
 			}
 		}
-	}
-	//Takes a unit and a move order and moves unit to that location
-	private void giveMoveOrder(Vector3 moveOrder, Unit unit){
-		Ray ray = Camera.main.ScreenPointToRay(moveOrder);
-		RaycastHit hit;
-		// Casts the ray and get the first game object hit
-		Physics.Raycast(ray, out hit);
 
-		unit.makeMove(hit);
+		// Loop through buildings and select the buildings that are in selection area
+		/*foreach(KeyValuePair<string,Building> entry in buildings) {
+			Building building = entry.Value;
+			if(building.isVisible() && Input.GetMouseButton(0)) {
+				Vector3 camPos = Camera.main.WorldToScreenPoint(building.transform.position);
+				camPos.y = InvertMouseY(camPos.y);
+				building.setSelected(selection.Contains(camPos));
+			}			
+		}*/
 	}
 	
-	// Inverts the Y component of the mouse vector
-	private static float InvertMouseY(float y)
-	{
-		return Screen.height - y;
-	}
-	
-	// Executes logic when the user moves the camera
-	private void moveCamera() {
-		int screenScrollLimit = Screen.height / 7;
-		float scrollRate = 0.4f;
-		Vector3 movementVectorX;
-		Vector3 movementVectorZ;
-	
-		// Scrolling with the mouse as it enters edges of screen
-		if (Input.mousePosition.y < screenScrollLimit && Input.mousePosition.y >= 0) {
-			movementVectorZ = new Vector3 (0f,0f,scrollRate);
-			transform.position -= movementVectorZ;
-		} else if (Input.mousePosition.y > Screen.height - screenScrollLimit && Input.mousePosition.y <= Screen.height) {
-			movementVectorZ = new Vector3 (0f,0f,scrollRate);
-			transform.position += movementVectorZ;
-		}
-		if (Input.mousePosition.x < screenScrollLimit && Input.mousePosition.x >= 0) {
-			movementVectorX = new Vector3 (scrollRate,0f,0f);
-			transform.position -= movementVectorX;
-		} else if (Input.mousePosition.x > Screen.width - screenScrollLimit && Input.mousePosition.x <= Screen.width) {
-			movementVectorX = new Vector3 (scrollRate,0f,0f);
-			transform.position += movementVectorX;
-		}
-
-		//Scrolling with the arrow keys 
-		if (Input.GetKey ("up") && !Input.GetKey ("down")) {
-			movementVectorZ = new Vector3 (0f,0f,scrollRate);
-			transform.position += movementVectorZ;
-		} else if (Input.GetKey ("down") && !Input.GetKey ("up")) {
-			movementVectorZ = new Vector3 (0f,0f,scrollRate);
-			transform.position -= movementVectorZ;
-		}
-		if (Input.GetKey ("left") && !Input.GetKey ("right")) {
-			movementVectorX = new Vector3 (scrollRate,0f,0f);
-			transform.position -= movementVectorX;
-		} else if (Input.GetKey ("right") && !Input.GetKey ("left")) {
-			movementVectorX = new Vector3 (scrollRate,0f,0f);
-			transform.position += movementVectorX;
-		}
-	}
-
 	//Creates formation, takes string:formationName
 	private void createFormation(string formationName, Vector3 mousePosition){
 		if(getNumUnitsSelected() > 1){
@@ -233,7 +269,6 @@ public class PersonPlayer : Player
 			int unitSpace = 15;
 			if (formationName == "Square" || formationName == "Squared") {
 				float side = Mathf.Sqrt (numberUnits);
-				//float middleSide = (side/2)*unitSpace;
 				foreach (Unit unit in selectedUnitsList) {
 					giveMoveOrder (movePosition, unit);
 					movePosition.x += unitSpace;
@@ -248,15 +283,15 @@ public class PersonPlayer : Player
 				float degreeOffset = 360 / numberUnits;
 				float radOffset = (degreeOffset * Mathf.PI) / 180;
 				float radianOffset = 0;
-
+				
 				foreach (Unit unit in selectedUnitsList) {
 					movePosition = mousePosition;
-
+					
 					movePosition.x += radius * Mathf.Sin (radianOffset);
 					movePosition.y += radius * Mathf.Cos (radianOffset);
-	
+					
 					giveMoveOrder (movePosition, unit);
-
+					
 					radianOffset += radOffset;
 				}
 			}
@@ -268,21 +303,130 @@ public class PersonPlayer : Player
 	}
 
 	private int getNumUnitsSelected(){
-		//unitCount
-		//"Cluster" will be default. Units attempts to be as close to center as possible without overlapping eachother.
-
-		//clears the list to make way for new units
+		
+		// Clears the list to make way for new units
 		selectedUnitsList.Clear ();
-		//selectedUnitsList = new List<Unit>();
-
+		
 		foreach (KeyValuePair<string,Unit> entry in units) {
 			Unit unit = entry.Value;
 			if(unit.getSelected()){
 				selectedUnitsList.Add(unit);
 			}
 		}
-		//sets class variable to be used when necessary without high overhead. hopefully.
 		return selectedUnitsList.Count;
+	}
+
+	// Takes a unit and a move order and moves unit to that location
+	private void giveMoveOrder(Vector3 moveOrder, Unit unit){
+		RaycastHit hit;
+		Ray ray = Camera.main.ScreenPointToRay(moveOrder);
+
+		// Casts the ray and get the first game object hit
+		Physics.Raycast(ray, out hit);
+
+		unit.makeMove (hit);
+	}
+	
+	// Inverts the Y component of the mouse vector
+	private static float InvertMouseY(float y)
+	{
+		return Screen.height - y;
+	}
+	
+	// Executes logic when the user moves the camera
+	private void moveCamera() {
+		int screenScrollLimit = Screen.height / 7;
+		float scrollRate = 0.4f;
+		Vector3 movementVectorX;
+		Vector3 movementVectorZ;
+
+		float cameraTop = camera.ScreenToWorldPoint (new Vector3 (0, camera.pixelHeight, 27.66f)).z;
+		float cameraBottom = camera.ScreenToWorldPoint (new Vector3 (0, 0, 27.66f)).z;
+		float cameraRight = camera.ScreenToWorldPoint (new Vector3 (camera.pixelWidth, 0, 27.66f)).x;
+		float cameraLeft = camera.ScreenToWorldPoint (new Vector3 (0, 0, 27.66f)).x;
+
+		// Scrolling with the mouse as it enters edges of screen
+		if (Input.mousePosition.y < screenScrollLimit && Input.mousePosition.y >= 0 && Input.mousePosition.x <= Screen.width - this.guiScreenWidth && cameraBottom > this.minWorldZ) {
+			movementVectorZ = new Vector3 (0f,0f,scrollRate);
+			transform.position -= movementVectorZ;
+		} else if (Input.mousePosition.y > Screen.height - screenScrollLimit && Input.mousePosition.y <= Screen.height && Input.mousePosition.x <= Screen.width - this.guiScreenWidth && cameraTop < this.maxWorldZ) {
+			movementVectorZ = new Vector3 (0f,0f,scrollRate);
+			transform.position += movementVectorZ;
+		}
+		if (Input.mousePosition.x < screenScrollLimit && Input.mousePosition.x >= 0  && cameraLeft > this.minWorldX) {
+			movementVectorX = new Vector3 (scrollRate,0f,0f);
+			transform.position -= movementVectorX;
+		} else if (Input.mousePosition.x > Screen.width - screenScrollLimit - this.guiScreenWidth && Input.mousePosition.x <= Screen.width - this.guiScreenWidth && cameraRight - guiWorldWidth < this.maxWorldX) {
+			movementVectorX = new Vector3 (scrollRate,0f,0f);
+			transform.position += movementVectorX;
+		}
+
+		// Scrolling with the arrow keys 
+		if (Input.GetKey ("up") && !Input.GetKey ("down") && cameraTop < this.maxWorldZ) {
+			movementVectorZ = new Vector3 (0f,0f,scrollRate);
+			transform.position += movementVectorZ;
+		} else if (Input.GetKey ("down") && !Input.GetKey ("up") && cameraBottom > this.minWorldZ) {
+			movementVectorZ = new Vector3 (0f,0f,scrollRate);
+			transform.position -= movementVectorZ;
+		}
+		if (Input.GetKey ("left") && !Input.GetKey ("right") && cameraLeft > this.minWorldX) {
+			movementVectorX = new Vector3 (scrollRate,0f,0f);
+			transform.position -= movementVectorX;
+		} else if (Input.GetKey ("right") && !Input.GetKey ("left") && cameraRight - guiWorldWidth < this.maxWorldX) {
+			movementVectorX = new Vector3 (scrollRate,0f,0f);
+			transform.position += movementVectorX;
+		}
+	}
+
+	/*********************************************************************************/
+	/*	Private GUI Functions - Order: Alphabetic							 	     */		
+	/*********************************************************************************/
+
+	private void buildingsTabListener(Button buildingTab, Button unitTab, GameObject buildingList, GameObject unitList) {
+		
+		// Deactivate Unit listing prefab
+		unitList.SetActive(false);
+		unselectTab (unitTab);
+		
+		// Activate Buildings listing prefab
+		buildingList.SetActive(true);
+		selectTab (buildingTab);
+		
+	}
+
+	private void selectTab(Button tab) {
+		var selectedColor = tab.colors;
+		selectedColor.normalColor =  new Color32(71, 71, 197, 255);
+		selectedColor.pressedColor = new Color32(71, 71, 197, 255);
+		selectedColor.highlightedColor = new Color32(71, 71, 197, 255);
+		selectedColor.disabledColor = new Color32(71, 71, 197, 255);
+		tab.colors = selectedColor;
+		
+		Text tabText = tab.GetComponentInChildren<Text> ();
+		tabText.color = Color.white;
+	}
+	
+	private void unitTabListener (Button buildingTab, Button unitTab, GameObject buildingList, GameObject unitList) {
+		
+		// Deactivate Buildings listing prefab
+		buildingList.SetActive(false);
+		unselectTab (buildingTab);
+		
+		// Activate Units listing prefab
+		unitList.SetActive(true);
+		selectTab (unitTab);
+	}
+
+	private void unselectTab(Button tab) {
+		var selectedColor = tab.colors;
+		selectedColor.normalColor = Color.grey;
+		selectedColor.pressedColor = Color.grey;
+		selectedColor.highlightedColor = Color.grey;
+		selectedColor.disabledColor = Color.grey;
+		tab.colors = selectedColor;
+		
+		Text tabText = tab.GetComponentInChildren<Text> ();
+		tabText.color = Color.black;
 	}
 }
 
