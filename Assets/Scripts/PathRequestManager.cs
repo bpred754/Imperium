@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class PathRequestManager : MonoBehaviour {
+public class PathRequestManager {
 	
 	private Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
 	private PathRequest currentPathRequest;
@@ -11,13 +11,13 @@ public class PathRequestManager : MonoBehaviour {
 	private PathFinding pathfinding;
 	private bool isProcessingPath;
 
-	/*********************************************************************************/
-	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
-	/*********************************************************************************/
-	
-	void Awake() {
-		instance = this;
-		pathfinding = GetComponent<PathFinding>();
+	// Constructor
+	public PathRequestManager(Grid _grid) {
+
+		if (instance == null) {
+			instance = this;
+			pathfinding = new PathFinding(this, _grid);
+		}
 	}
 
 	/*********************************************************************************/

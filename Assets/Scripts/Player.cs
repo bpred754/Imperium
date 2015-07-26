@@ -3,7 +3,7 @@ using UnityEngine;
 	
 public class Player : MonoBehaviour
 {
-	public Team team;
+	protected Team team;
 
 	/*********************************************************************************/
 	/*	Getter and Setter Functions - Order: Alphabetic							 	 */		

@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class PathFinding : MonoBehaviour {
+public class PathFinding {
 
 	private PathRequestManager requestManager;
 	private Vector3 targetPosition;
@@ -11,21 +11,18 @@ public class PathFinding : MonoBehaviour {
 	private int buildingHeight = 1;
 	private Grid grid;
 
-	/*********************************************************************************/
-	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
-	/*********************************************************************************/
-
-	public void Awake(){
-		requestManager = GetComponent<PathRequestManager>();
-		grid = GetComponent<Grid>();
+	// Constructor
+	public PathFinding(PathRequestManager _manager, Grid _grid) {
+		this.requestManager = _manager;
+		this.grid = _grid;
 	}
-	
+
 	/*********************************************************************************/
 	/*	Public Functions - Order: Alphabetic										 */		
 	/*********************************************************************************/	
 
 	public void StartFindPath(Vector3 startPos, RaycastHit targetPos){
-		StartCoroutine(FindPath (startPos,targetPos));
+		FindPath (startPos,targetPos);
 	}
 
 	/*********************************************************************************/
@@ -66,7 +63,7 @@ public class PathFinding : MonoBehaviour {
 		}
 	}
 
-	private IEnumerator FindPath(Vector3 startPos, RaycastHit targetPos){
+	private void FindPath(Vector3 startPos, RaycastHit targetPos){
 
 		Vector3[] wayPoints = new Vector3[0];
 		bool pathSuccess = false;
@@ -117,7 +114,6 @@ public class PathFinding : MonoBehaviour {
 				}
 			}
 		}
-		yield return null;
 		if (pathSuccess) {
 			wayPoints = RetracePath (startNode, targetNode);
 			requestManager.FinishedProcessingPath (wayPoints, pathSuccess);

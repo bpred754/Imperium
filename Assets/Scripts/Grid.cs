@@ -4,15 +4,14 @@ using System.Collections.Generic;
 
 public class Grid : MonoBehaviour {
 
-	public bool displayGridGizmos;
-	public LayerMask unwalkableMask;
-	public LayerMask Floor;
-	public LayerMask Ground;
-	public LayerMask Ramp;
-	public LayerMask Unit;
-	public Vector2 gridWorldSize;
-	public float nodeRadius;
-
+	private bool displayGridGizmos;
+	private LayerMask unwalkableMask;
+	private LayerMask Floor;
+	private LayerMask Ground;
+	private LayerMask Ramp;
+	private LayerMask Unit;
+	private Vector2 gridWorldSize;
+	private float nodeRadius;
 	private Node[,] grid;
 	private float nodeDiameter;
 	private int gridSizeX, gridSizeY;
@@ -21,15 +20,8 @@ public class Grid : MonoBehaviour {
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
 
-	public void Awake(){
-		nodeDiameter = nodeRadius * 2;
-		gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
-		gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
-		CreateGrid ();
-	}
-
 	public void Update(){
-		CreateGrid ();
+		updateGrid ();
 	}
 
 	/*********************************************************************************/
@@ -37,6 +29,10 @@ public class Grid : MonoBehaviour {
 	/*********************************************************************************/	
 
 	public void CreateGrid(){
+		nodeDiameter = nodeRadius * 2;
+		gridSizeX = Mathf.RoundToInt(gridWorldSize.x / nodeDiameter);
+		gridSizeY = Mathf.RoundToInt(gridWorldSize.y / nodeDiameter);
+
 		grid = new Node[gridSizeX, gridSizeY];
 		Vector3 worldBottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
 		int floorNum = -1;
@@ -61,7 +57,7 @@ public class Grid : MonoBehaviour {
 				}else{
 					floorNum = -1;
 				}
-
+			
 				grid[x,y] = new Node(floorNum,worldPoint,x,y);
 			}
 		}
@@ -104,6 +100,66 @@ public class Grid : MonoBehaviour {
 		int y = Mathf.RoundToInt((gridSizeY - 1) * percentY);
 
 		return(grid [x, y]);
+	}
+
+	// TODO: Implement updateGrid method (This is almost identicaly copy of createGrid)
+	public void updateGrid(){
+		grid = new Node[gridSizeX, gridSizeY];
+		Vector3 worldBottomLeft = transform.position - Vector3.right * gridWorldSize.x / 2 - Vector3.forward * gridWorldSize.y / 2;
+		int floorNum = -1;
+		
+		for (int x = 0; x < gridSizeX; x++) {
+			for (int y = 0; y < gridSizeY; y++) {
+				Vector3 worldPoint = worldBottomLeft + Vector3.right * (x * nodeDiameter + nodeRadius) + Vector3.forward * (y * nodeDiameter + nodeRadius);
+				
+				bool testGround = (Physics.CheckSphere(worldPoint,nodeRadius,Ground));
+				bool testFloor = (Physics.CheckSphere(worldPoint,nodeRadius,Floor));
+				bool testRamp = (Physics.CheckSphere(worldPoint,nodeRadius,Ramp));
+				bool testObstacle = (Physics.CheckSphere(worldPoint,nodeRadius,unwalkableMask));
+				
+				if(testObstacle){ // obstacle
+					floorNum = 0;
+				}else if(testRamp){ //ramp
+					floorNum = 3;
+				}else if(testFloor){ //second floor
+					floorNum = 2;
+				}else if(testGround){ //ground floor
+					floorNum = 1;
+				}else{
+					floorNum = -1;
+				}
+				//Debug.Log ("UPDATING");
+				grid[x,y] = new Node(floorNum,worldPoint,x,y);
+			}
+		}
+	}
+
+	/*********************************************************************************/
+	/*	Getter and Setter Functions - Order: Alphabetic							 	 */		
+	/*********************************************************************************/
+
+	public void setFloor(LayerMask _floor) {
+		this.Floor = _floor;
+	}
+
+	public void setGridWorldSize(Vector2 _gridWorldSize) {
+		this.gridWorldSize = _gridWorldSize;
+	}
+
+	public void setGround(LayerMask _ground) {
+		this.Ground = _ground;
+	}
+
+	public void setNodeRadius(float _nodeRadius) {
+		this.nodeRadius = _nodeRadius;
+	}
+
+	public void setRamp(LayerMask _ramp) {
+		this.Ramp = _ramp;
+	}
+
+	public void setUnwalkableMask(LayerMask _unwalkableMask) {
+		this.unwalkableMask = _unwalkableMask;
 	}
 
 	/*********************************************************************************/
