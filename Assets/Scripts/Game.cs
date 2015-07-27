@@ -2,30 +2,47 @@
 using System.Collections;
 
 public class Game : MonoBehaviour {
-
+	
+	private GameObject camera;
+	private CameraManager cameraManager;
 	private GameObject cameraPrefab;
-	private PersonPlayer myPlayer;
-	private Grid myGrid;
+	private GameObject game;
+	private Grid grid;
+	private Transform ground;
+	private Renderer groundRenderer;
+	private GUIManager guiManager;
 	private PathRequestManager pathRequestManager;
+	private PersonPlayer player;
 
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
 	
+	private void Awake() {
+		// Load Resources
+		this.cameraPrefab = Resources.Load<GameObject> ("Camera");
+		
+		// Get components
+		this.ground = GetComponent<Transform> ();
+		this.groundRenderer = GetComponent<Renderer> ();
+		this.game = ground.gameObject;
+
+		// Create reference to grid
+		this.grid = game.AddComponent<Grid>();
+
+		// Instantiate players
+		this.camera = (GameObject)Instantiate(cameraPrefab, new Vector3 (0, 27.66f, 0), Quaternion.Euler (60, 0, 0));
+		this.player = camera.GetComponent<PersonPlayer> ();
+
+		// Create references to managers
+		this.cameraManager = camera.GetComponent<CameraManager> ();
+		this.guiManager = camera.GetComponent<GUIManager> ();
+	}
+	
 	void Start () {
 
-		// Load Resources
-		cameraPrefab = Resources.Load<GameObject> ("Camera");
-
-		// Get scene components
-		Transform ground = GetComponent<Transform> ();
-		Renderer groundRenderer = GetComponent<Renderer> ();
-		GameObject game = ground.gameObject;
-
-		// Set players
-		GameObject camera = (GameObject)Instantiate(cameraPrefab, new Vector3 (0, 27.66f, 0), Quaternion.Euler (60, 0, 0));
-		myPlayer = camera.GetComponent<PersonPlayer> ();
-		this.myPlayer.setTeam (Team.Allies);
+		// Set players team
+		this.player.setTeam (Team.Allies);
 
 		// Set players camera boundaries
 		Vector3 groundPosition = ground.position;
@@ -34,30 +51,26 @@ public class Game : MonoBehaviour {
 		float minWorldX = groundPosition.x - groundSize.x/2;
 		float maxWorldZ = groundPosition.z + groundSize.z/2;
 		float minWorldZ = groundPosition.z - groundSize.z/2;
-		this.myPlayer.setCameraBoundaries (maxWorldX, minWorldX, maxWorldZ, minWorldZ);
+		this.cameraManager.setCameraBoundaries (maxWorldX, minWorldX, maxWorldZ, minWorldZ);
 
 		// Set the players grid
-		game.layer = LayerMask.NameToLayer("Ground");
-		myGrid = game.AddComponent<Grid>();
-		myGrid.setGridWorldSize (new Vector2(groundSize.x, groundSize.z));
-		myGrid.setNodeRadius (.75f);
-		myGrid.setUnwalkableMask(LayerMask.GetMask("Unwalkable"));
-		myGrid.setFloor(LayerMask.GetMask("Floor"));
-		myGrid.setGround(LayerMask.GetMask("Ground"));
-		myGrid.setRamp(LayerMask.GetMask("Ramp"));
-		myGrid.CreateGrid ();
-		this.myPlayer.setGrid (myGrid);
+		this.game.layer = LayerMask.NameToLayer("Ground");
+		this.grid.setGridWorldSize (new Vector2(groundSize.x, groundSize.z));
+		this.grid.setNodeRadius (.75f);
+		this.grid.setUnwalkableMask(LayerMask.GetMask("Unwalkable"));
+		this.grid.setFloor(LayerMask.GetMask("Floor"));
+		this.grid.setGround(LayerMask.GetMask("Ground"));
+		this.grid.setRamp(LayerMask.GetMask("Ramp"));
+		this.grid.CreateGrid ();
+		this.guiManager.setGrid (this.grid);
 
 		// Create the game's PathRequestManager(singleton)
-		this.pathRequestManager = new PathRequestManager (myGrid);
+		this.pathRequestManager = new PathRequestManager (this.grid);
 
 		// DEBUG - Add buildings to map
-		this.myPlayer.createBuilding (new Vector3 (40f, 1f, 45f)); // Create base
-		this.myPlayer.createBuilding (new Vector3 (45f, 1f, 40f)); // Create base
-		this.myPlayer.createBuilding (new Vector3 (45f, 1f, 45f)); // Create base
-		this.myPlayer.createBuilding (new Vector3 (40f, 1f, 40f)); // Create base
+		this.player.createBuilding (new Vector3 (40f, 1f, 45f)); // Create base
+		this.player.createBuilding (new Vector3 (45f, 1f, 40f)); // Create base
+		this.player.createBuilding (new Vector3 (45f, 1f, 45f)); // Create base
+		this.player.createBuilding (new Vector3 (40f, 1f, 40f)); // Create base
 	}
-	
-	// Update is called once per frame
-	void Update () {}
 }
