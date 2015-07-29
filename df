@@ -1,0 +1,45 @@
+[33m7279086[m Added an idea on resources. Also fixed up my main scene, pathfinding test, so that it works with all of the new changes
+[33m264944d[m Fix bug - Fit players GUI to screen for different resolutions
+[33m9f1fcca[m Organized scripts to into folders
+[33m88c5907[m Adding missed files from last commit.
+[33m47b2069[m Abstract out GUI and input logic from PersonPlayer into InputManager, GUIManager, and CameraManager
+[33me020266[m Added Grid instantiation to Game.cs. Removed MonoBehavior from PathFinding and PathRequestManager
+[33mcba568a[m Added Refactor0 Design Diagram
+[33me0b7853[m Code Cleanup
+[33mab74a21[m README typo
+[33ma14346b[m Updated README. Added commit check list
+[33mfaeb346[m Added debug toggle buttons for grid and way points.
+[33m3372e07[m Added GUI and camera boundaries.
+[33ma38cdaa[m Fixed a bug with the grid. Before it was assigning locations incorrectly based on the expectation of a groun layer built in. Now grids do not require a built in floor. They read the objects that are on it to tell what the nodes of the grid should represent.
+[33m7920ca5[m Working on something. Just pushing to get  it to work.... I know, bad practice.
+[33m15c7ad9[m Fixed some issues with scaling window size, all errors with that are not fixed yet. Also added code that allows the pathfinding script to know what object was clicked, what layer it is at. Hopefully this will be used to be able to have units at different heights on the same node
+[33m526659b[m Practicing making bigger buildings in scene. Not quite working how i want but it doesn't break anything so I'm pushing it.
+[33mb3d5e65[m Fixed a bug where attempting to create a move order near the unit would fail because it was the same node. Now the unit will move any distance to where the mouse was clicked. Much cleaner now.
+[33m0661dde[m Fixed the units rotation if movement ended with it pointing at an odd angle. Unit flattens out at the end of its movement now.
+[33m91ea146[m Added different floors. Units can move between floors via ramps
+[33m4ea38e6[m Fixed Unit Movement. Units will find the closest walkable Node to the target if it is unwalkable. Somewhat optimized. I'm sure it could be optimized more though.
+[33m709d621[m Fixed a bug in the pathfinding where clicking on obstacle could possibly freeze program
+[33mfde8511[m Fixed unit movement. Units will find next closest location if target is an obstacle.
+[33m0a482d4[m Unit rotation is working. Units point in direction of travel, in the direction of the current waypoint. It looks a bit jerky but I can worry about that later. This is good enough for now.
+[33m9e0adc9[m Building units has been fixed. Multiple buildings can be built, units names are unit building number unit number. each building has a building number. units are all selectable and moveable now.
+[33me900a6c[m Pathfinding. Units move in somewhat shortest path to target while avoiding obstacles that are in the unwalkable layermask.
+[33m9c0c499[m Added obstacles, grid, and buildings as obstacles
+[33mfaf3305[m Unit Movement/Formations. Circle formation and square formations added. Fronts of units added. Rotation has not been done yet.
+[33m218ac04[m Name: Preparing Unit Formations. Added helper functions that count the number of units selected WHEN move order is given. Creates a list of selected units to, hopefully, help move those units with less calculations. Unit collisions are effectively turned off. If you want them on un check the freeze positions for x y z. I turned it off because it will help with my unit formation while I am testing it. They will probably be turned on afterwards.
+[33m7208e63[m Added control clicking for selecting units
+[33m91dd7f4[m This is the basic unit movement addition. Units can move independently but not intelligently, they move in straight line paths and do not avoid eachother or other obstacles. They all fight eachother to get to the move order location which they all share. Also the isMoving never gets set to false. Working on that
+[33m9a099c6[m Fixed Screen scrolling. If mouse is outside of the playable window it stops scrolling
+[33m5e02ee9[m Commiting missed file
+[33m9a7cae5[m Commiting missed prefab and meta files
+[33m7e9d7c3[m Removed unecessary files.
+[33mb4b07a1[m Restructured game design. Added buildings. Added unit creation with selection logic.
+[33m6a678e9[m Added screen scrolling with mouse and arrow keys. No boundaries were added yet. This is all done in the cameraOperator class for now.
+[33m113037f[m Added some of the ideas I had about the games story line and unit types, rankings, formation groupings etc. Also Added one image of what I imaginged system view would look like. I made it in paint, don't judge...
+[33mafe3307[m Restructured project
+[33mc210934[m Ship Movement
+[33m7b51eac[m Testing commits
+[33m1b36a2d[m Update README.md
+[33mfc4cf44[m test commit
+[33m945cf2b[m Initial commit
+[33mdeab771[m Update .gitignore
+[33ma900bd8[m Initial commit
