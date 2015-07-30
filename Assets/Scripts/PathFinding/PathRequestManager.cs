@@ -8,7 +8,7 @@ public class PathRequestManager {
 	private Queue<PathRequest> pathRequestQueue = new Queue<PathRequest>();
 	private PathRequest currentPathRequest;
 	private static PathRequestManager instance;
-	private PathFinding pathfinding;
+	private PathFinder pathfinder;
 	private bool isProcessingPath;
 
 	// Constructor
@@ -16,7 +16,7 @@ public class PathRequestManager {
 
 		if (instance == null) {
 			instance = this;
-			pathfinding = new PathFinding(this, _grid);
+			pathfinder = new PathFinder(this, _grid);
 		}
 	}
 
@@ -44,7 +44,7 @@ public class PathRequestManager {
 		if (!isProcessingPath && pathRequestQueue.Count > 0) {
 			currentPathRequest = pathRequestQueue.Dequeue();
 			isProcessingPath = true;
-			pathfinding.StartFindPath(currentPathRequest.getPathStart(), currentPathRequest.getPathEnd());
+			pathfinder.StartFindPath(currentPathRequest.getPathStart(), currentPathRequest.getPathEnd());
 		}
 	}
 }

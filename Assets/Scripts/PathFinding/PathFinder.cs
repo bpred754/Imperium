@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public class PathFinding {
+public class PathFinder {
 
 	private PathRequestManager requestManager;
 	private Vector3 targetPosition;
@@ -12,7 +12,7 @@ public class PathFinding {
 	private Grid grid;
 
 	// Constructor
-	public PathFinding(PathRequestManager _manager, Grid _grid) {
+	public PathFinder(PathRequestManager _manager, Grid _grid) {
 		this.requestManager = _manager;
 		this.grid = _grid;
 	}
