@@ -84,7 +84,11 @@ public class InputManager : MonoBehaviour
 			}
 		} //If right click is pressed down, i.e. move order is made
 		else if (Input.GetMouseButtonDown (1)) {
-			this.player.moveSelectedUnitsInFormation(Input.mousePosition);
+
+			RaycastHit hit;
+			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+			Physics.Raycast(ray, out hit);
+			this.player.moveSelectedUnitsInFormation(hit.point);
 		}
 	}
 
