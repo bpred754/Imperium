@@ -44,7 +44,7 @@ public class Unit : MonoBehaviour {
 		return GetComponent<Renderer> ().isVisible;
 	}
 	
-	public void makeMove(RaycastHit target){
+	public void makeMove(Vector3 target){
 		PathRequestManager.RequestPath(transform.position, target, OnPathFound);		
 	}
 

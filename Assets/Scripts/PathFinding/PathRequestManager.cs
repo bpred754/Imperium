@@ -30,7 +30,7 @@ public class PathRequestManager {
 		TryProcessNext();
 	}
 
-	public static void RequestPath(Vector3 pathStart, RaycastHit pathEnd, Action<Vector3[], bool> callback) {
+	public static void RequestPath(Vector3 pathStart, Vector3 pathEnd, Action<Vector3[], bool> callback) {
 		PathRequest newRequest = new PathRequest(pathStart,pathEnd,callback);
 		instance.pathRequestQueue.Enqueue(newRequest);
 		instance.TryProcessNext();

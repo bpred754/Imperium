@@ -20,7 +20,7 @@ public class PathFinder {
 	/*	Public Functions - Order: Alphabetic										 */		
 	/*********************************************************************************/	
 
-	public Vector3[] StartFindPath(Vector3 startPos, RaycastHit targetPos){
+	public Vector3[] StartFindPath(Vector3 startPos, Vector3 targetPos){
 		return(FindPath (startPos, targetPos));
 	}
 
@@ -62,11 +62,11 @@ public class PathFinder {
 		}
 	}
 
-	private Vector3[] FindPath(Vector3 startPos, RaycastHit targetPos){
+	private Vector3[] FindPath(Vector3 startPos, Vector3 targetPos){
 
 		Vector3[] wayPoints = new Vector3[0];
 		bool pathSuccess = false;
-		targetPosition = targetPos.point;
+		targetPosition = targetPos;
 
 		Node startNode = grid.NodeFromWorldPoint(startPos);
 		Node targetNode = grid.NodeFromWorldPoint(targetPosition);

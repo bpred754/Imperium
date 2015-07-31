@@ -81,13 +81,6 @@ public class PersonPlayer : Player
 	}
 
 	public void moveSelectedUnitsInFormation(Vector3 mousePosition) {
-		// Formations
-		RaycastHit hit;
-		Ray ray = Camera.main.ScreenPointToRay(mousePosition);
-		
-		// Casts the ray and get the first game object hit
-		Physics.Raycast(ray, out hit);
-		this.layer = hit.collider.gameObject.layer;
 		createFormation(this.formation, mousePosition);
 	}
 
@@ -135,15 +128,15 @@ public class PersonPlayer : Player
 		if(getNumUnitsSelected() > 1){
 			Vector3 movePosition = mousePosition;
 			int numberUnits = getNumUnitsSelected ();
-			int unitSpace = 15;
+			int unitSpace = 1;
 			if (formationName == "Square" || formationName == "Squared") {
 				float side = Mathf.Sqrt (numberUnits);
 				foreach (Unit unit in selectedUnitsList) {
-					giveMoveOrder (movePosition, unit);
+					unit.makeMove (movePosition);
 					movePosition.x += unitSpace;
 					if (movePosition.x >= mousePosition.x + unitSpace * side) {
 						movePosition.x = mousePosition.x;
-						movePosition.y -= unitSpace;
+						movePosition.z -= unitSpace;
 					}
 				}
 			} else if (formationName == "Shell" || formationName == "Shelled") {
@@ -157,16 +150,16 @@ public class PersonPlayer : Player
 					movePosition = mousePosition;
 					
 					movePosition.x += radius * Mathf.Sin (radianOffset);
-					movePosition.y += radius * Mathf.Cos (radianOffset);
-					
-					giveMoveOrder (movePosition, unit);
+					movePosition.z += radius * Mathf.Cos (radianOffset);
+
+					unit.makeMove (movePosition);
 					
 					radianOffset += radOffset;
 				}
 			}
 		}else{ //If only one unit is selected
 			foreach (Unit unit in selectedUnitsList) {
-				giveMoveOrder (mousePosition, unit);
+				unit.makeMove (mousePosition);
 			}
 		}
 	}
@@ -183,17 +176,6 @@ public class PersonPlayer : Player
 			}
 		}
 		return selectedUnitsList.Count;
-	}
-
-	// Takes a unit and a move order and moves unit to that location
-	private void giveMoveOrder(Vector3 moveOrder, Unit unit){
-		RaycastHit hit;
-		Ray ray = Camera.main.ScreenPointToRay(moveOrder);
-
-		// Casts the ray and get the first game object hit
-		Physics.Raycast(ray, out hit);
-
-		unit.makeMove (hit);
 	}
 
 	/*********************************************************************************/
