@@ -16,7 +16,7 @@ public class PathRequestManager {
 
 		if (instance == null) {
 			instance = this;
-			pathfinder = new PathFinder(this, _grid);
+			pathfinder = new PathFinder(_grid);
 		}
 	}
 
@@ -44,7 +44,7 @@ public class PathRequestManager {
 		if (!isProcessingPath && pathRequestQueue.Count > 0) {
 			currentPathRequest = pathRequestQueue.Dequeue();
 			isProcessingPath = true;
-			pathfinder.StartFindPath(currentPathRequest.getPathStart(), currentPathRequest.getPathEnd());
+			FinishedProcessingPath (pathfinder.StartFindPath(currentPathRequest.getPathStart(), currentPathRequest.getPathEnd()), true);;
 		}
 	}
 }

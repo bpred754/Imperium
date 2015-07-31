@@ -5,15 +5,14 @@ using System;
 
 public class PathFinder {
 
-	private PathRequestManager requestManager;
+
 	private Vector3 targetPosition;
 	private bool newTarget = false;
 	private int buildingHeight = 1;
 	private Grid grid;
 
 	// Constructor
-	public PathFinder(PathRequestManager _manager, Grid _grid) {
-		this.requestManager = _manager;
+	public PathFinder(Grid _grid) {
 		this.grid = _grid;
 	}
 
@@ -21,8 +20,8 @@ public class PathFinder {
 	/*	Public Functions - Order: Alphabetic										 */		
 	/*********************************************************************************/	
 
-	public void StartFindPath(Vector3 startPos, RaycastHit targetPos){
-		FindPath (startPos,targetPos);
+	public Vector3[] StartFindPath(Vector3 startPos, RaycastHit targetPos){
+		return(FindPath (startPos, targetPos));
 	}
 
 	/*********************************************************************************/
@@ -63,7 +62,7 @@ public class PathFinder {
 		}
 	}
 
-	private void FindPath(Vector3 startPos, RaycastHit targetPos){
+	private Vector3[] FindPath(Vector3 startPos, RaycastHit targetPos){
 
 		Vector3[] wayPoints = new Vector3[0];
 		bool pathSuccess = false;
@@ -116,9 +115,9 @@ public class PathFinder {
 		}
 		if (pathSuccess) {
 			wayPoints = RetracePath (startNode, targetNode);
-			requestManager.FinishedProcessingPath (wayPoints, pathSuccess);
+			return wayPoints;
 		} else {
-			requestManager.FinishedProcessingPath (wayPoints, pathSuccess);
+			return wayPoints;
 		}
 	}
 
