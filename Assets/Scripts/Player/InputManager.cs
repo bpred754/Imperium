@@ -54,41 +54,45 @@ public class InputManager : MonoBehaviour
 		}
 		
 		if (Input.GetMouseButtonDown (0)) {
-			Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
-			RaycastHit hit;
-			if (Physics.Raycast (ray, out hit)) {
-				/*Debug.Log ("Name = " + hit.collider.name);
-				Debug.Log ("Tag = " + hit.collider.tag);
-				Debug.Log ("Hit Point = " + hit.point);
-				Debug.Log ("Object position = " + hit.collider.gameObject.transform.position);
-				Debug.Log ("Object bounds = " + hit.collider.bounds.size);
-				Debug.Log ("--------------");*/
+			if(Input.mousePosition.x <= Screen.width - this.camera.getGUIScreenWidth()){
+				Ray ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+				RaycastHit hit;
+				if (Physics.Raycast (ray, out hit)) {
+					/*Debug.Log ("Name = " + hit.collider.name);
+					Debug.Log ("Tag = " + hit.collider.tag);
+					Debug.Log ("Hit Point = " + hit.point);
+					Debug.Log ("Object position = " + hit.collider.gameObject.transform.position);
+					Debug.Log ("Object bounds = " + hit.collider.bounds.size);
+					Debug.Log ("--------------");*/
 
-				// If building is clicked create new unit
-				string objectName = hit.collider.name;
-				if (this.player.hasBuilding(objectName)) {
-					this.player.createUnit(objectName);
-				}
+					// If building is clicked create new unit
+					string objectName = hit.collider.name;
+					if (this.player.hasBuilding(objectName)) {
+						this.player.createUnit(objectName);
+					}
 
-				// If a unit is clicked unselect other units
-				if (this.player.hasUnit(objectName)) {
-					this.player.setUnitsSelection(objectName, isControlPressed);
-				}
+					// If a unit is clicked unselect other units
+					if (this.player.hasUnit(objectName)) {
+						this.player.setUnitsSelection(objectName, isControlPressed);
+					}
 
-				// If the ground is clicked unselect units
-				if (objectName == "Ground") {
-					if(!isControlPressed){
-						this.player.unselectUnits();
+					// If the ground is clicked unselect units
+					if (objectName == "Game") {
+						if(!isControlPressed){
+							this.player.unselectUnits();
+						}
 					}
 				}
 			}
 		} //If right click is pressed down, i.e. move order is made
 		else if (Input.GetMouseButtonDown (1)) {
 
-			RaycastHit hit;
-			Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-			Physics.Raycast(ray, out hit);
-			this.player.moveSelectedUnitsInFormation(hit.point);
+			if(Input.mousePosition.x <= Screen.width - this.camera.getGUIScreenWidth()){
+				RaycastHit hit;
+				Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+				Physics.Raycast(ray, out hit);
+				this.player.moveSelectedUnitsInFormation(hit.point);
+			}
 		}
 	}
 

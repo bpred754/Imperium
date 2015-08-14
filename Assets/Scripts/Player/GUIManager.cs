@@ -19,7 +19,6 @@ public class GUIManager : MonoBehaviour
 	private float guiButtonContainerHeight;
 	private float guiScreenWidth = 0;
 	private float guiWorldWidth = 0;
-	private GameObject minimap;
 	private PersonPlayer player;
 	private float previousGuiButtonContainerHeight;
 	private GameObject tabs;
@@ -31,7 +30,6 @@ public class GUIManager : MonoBehaviour
 	
 	// Prefabs
 	private GameObject buildingListPrefab;
-	private GameObject minimapPrefab;
 	private GameObject tabsPrefab;
 	private GameObject unitListPrefab;
 
@@ -41,7 +39,6 @@ public class GUIManager : MonoBehaviour
 	private RectTransform buildingTabTransform;
 	private Text buildingTabText;
 	private RectTransform canvasRectTransform;
-	private RectTransform miniMapRectTransform;
 	private RectTransform tabTransform;
 	private RectTransform[] unitButtonTransforms;
 	private RectTransform unitListRectTransform;
@@ -54,7 +51,6 @@ public class GUIManager : MonoBehaviour
 	void Awake ()
 	{
 		// Load Resources
-		this.minimapPrefab = Resources.Load<GameObject> ("MiniMap");
 		this.tabsPrefab = Resources.Load<GameObject> ("GUITabs");
 		this.buildingListPrefab = Resources.Load<GameObject> ("GUIBuildingList");
 		this.unitListPrefab = Resources.Load<GameObject> ("GUIUnitList");
@@ -68,17 +64,12 @@ public class GUIManager : MonoBehaviour
 			GameObject es = new GameObject ("EventSystem", typeof(EventSystem));
 			es.AddComponent<StandaloneInputModule> ();
 		}
-		
+
 		// Add canvas to scene
 		GameObject canvasObject = new GameObject ("Canvas");
 		this.canvas = canvasObject.AddComponent<Canvas> ();
 		this.canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 		canvasObject.AddComponent<GraphicRaycaster> ();
-		
-		// Add minimap to canvas
-		this.minimap = (GameObject)Instantiate (minimapPrefab);
-		this.minimap.transform.SetParent (canvas.transform, false);
-		this.miniMapRectTransform = this.minimap.GetComponent<RectTransform> ();
 		
 		// Add tabs to canvas
 		this.tabs = (GameObject)Instantiate (tabsPrefab);
@@ -118,13 +109,10 @@ public class GUIManager : MonoBehaviour
 	private void Start() {
 
 		// Set initial sizes of GUI elements
-		this.canvasRectTransform = this.canvas.GetComponent<RectTransform> ();
-
-		this.miniMapRectTransform.sizeDelta = new Vector2(GUI_WIDTH,GUI_WIDTH);
-		this.miniMapRectTransform.anchoredPosition = new Vector3 (-1*GUI_WIDTH/2, -1*GUI_WIDTH/2);
+		this.canvasRectTransform = this.canvas.GetComponent<RectTransform> ();;
 
 		this.tabTransform.sizeDelta = new Vector2 (GUI_WIDTH, TAB_HEIGHT);
-		this.tabTransform.anchoredPosition = new Vector3 (-1*GUI_WIDTH/2, -1*TAB_HEIGHT/2 - miniMapRectTransform.rect.height);
+		this.tabTransform.anchoredPosition = new Vector3 (-1*GUI_WIDTH/2, -1*TAB_HEIGHT/2 - GUI_WIDTH);
 
 		this.buildingTabTransform.sizeDelta = new Vector2 (GUI_WIDTH/2, TAB_HEIGHT*1.5f);
 		this.buildingTabTransform.anchoredPosition = new Vector2 (buildingTabTransform.sizeDelta.x/2, 0);
@@ -214,6 +202,14 @@ public class GUIManager : MonoBehaviour
 	/*	Private Functions - Order: Alphabetic										 */		
 	/*********************************************************************************/
 
+	public void initializeMiniMap(Grid _grid) {
+		this.grid = _grid;
+	}
+
+	/*********************************************************************************/
+	/*	Private Functions - Order: Alphabetic										 */		
+	/*********************************************************************************/
+
 	private void buildingsTabListener(Button buildingTab, Button unitTab, GameObject buildingList, GameObject unitList) {
 		
 		// Deactivate Unit listing prefab
@@ -224,7 +220,7 @@ public class GUIManager : MonoBehaviour
 		buildingList.SetActive(true);
 		selectTab (buildingTab);
 	}
-	
+
 	private void selectTab(Button tab) {
 		var selectedColor = tab.colors;
 		selectedColor.normalColor =  new Color32(71, 71, 197, 255);
@@ -265,10 +261,6 @@ public class GUIManager : MonoBehaviour
 	/*********************************************************************************/
 
 	private bool displayWayPointGizmos = false;
-	
-	public void setGrid(Grid inGrid) {
-		this.grid = inGrid;
-	}
 
 	private void selectButton(Button button) {
 		var selectedColor = button.colors;

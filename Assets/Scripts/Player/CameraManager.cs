@@ -3,6 +3,8 @@ using System.Collections;
 
 public class CameraManager : MonoBehaviour
 {
+	public static float CAMERA_HEIGHT = 27.66f;
+
 	private Camera camera;
 	private float guiScreenWidth = 0;
 	private float guiWorldWidth = 0;
@@ -39,8 +41,8 @@ public class CameraManager : MonoBehaviour
 		this.guiScreenWidth = _guiScreenWidth;
 
 		// Set GUI world width variable
-		float left = camera.ScreenToWorldPoint (new Vector3(0,0, 27.66f)).x;
-		float right = camera.ScreenToWorldPoint (new Vector3(90,0, 27.66f)).x;
+		float left = camera.ScreenToWorldPoint (new Vector3(0,0, CAMERA_HEIGHT)).x;
+		float right = camera.ScreenToWorldPoint (new Vector3(_guiScreenWidth,0, CAMERA_HEIGHT)).x;
 		this.guiWorldWidth = right - left;
 	}
 
@@ -55,10 +57,10 @@ public class CameraManager : MonoBehaviour
 		Vector3 movementVectorX;
 		Vector3 movementVectorZ;
 		
-		float cameraTop = camera.ScreenToWorldPoint (new Vector3 (0, camera.pixelHeight, 27.66f)).z;
-		float cameraBottom = camera.ScreenToWorldPoint (new Vector3 (0, 0, 27.66f)).z;
-		float cameraRight = camera.ScreenToWorldPoint (new Vector3 (camera.pixelWidth, 0, 27.66f)).x;
-		float cameraLeft = camera.ScreenToWorldPoint (new Vector3 (0, 0, 27.66f)).x;
+		float cameraTop = camera.ScreenToWorldPoint (new Vector3 (0, camera.pixelHeight, CAMERA_HEIGHT)).z;
+		float cameraBottom = camera.ScreenToWorldPoint (new Vector3 (0, 0, CAMERA_HEIGHT)).z;
+		float cameraRight = camera.ScreenToWorldPoint (new Vector3 (camera.pixelWidth, 0, CAMERA_HEIGHT)).x;
+		float cameraLeft = camera.ScreenToWorldPoint (new Vector3 (0, 0, CAMERA_HEIGHT)).x;
 		
 		// Scrolling with the mouse as it enters edges of screen
 		if (Input.mousePosition.y < screenScrollLimit && Input.mousePosition.y >= 0 && Input.mousePosition.x <= Screen.width - this.guiScreenWidth && cameraBottom > this.minWorldZ) {
@@ -91,5 +93,48 @@ public class CameraManager : MonoBehaviour
 			movementVectorX = new Vector3 (scrollRate,0f,0f);
 			transform.position += movementVectorX;
 		}
+	}
+
+	/*********************************************************************************/
+	/*	Public Functions - Order: Alphabetic										 */		
+	/*********************************************************************************/
+
+	public void moveCameraToVector(Vector3 moveVector) {
+
+		transform.position = new Vector3 (moveVector.x, CAMERA_HEIGHT, moveVector.z);
+
+		float cameraTop = camera.ScreenToWorldPoint (new Vector3 (0, camera.pixelHeight, CAMERA_HEIGHT)).z;
+		float cameraBottom = camera.ScreenToWorldPoint (new Vector3 (0, 0, CAMERA_HEIGHT)).z;
+		float cameraRight = camera.ScreenToWorldPoint (new Vector3 (camera.pixelWidth, 0, CAMERA_HEIGHT)).x;
+		float cameraLeft = camera.ScreenToWorldPoint (new Vector3 (0, 0, CAMERA_HEIGHT)).x;
+		
+		// Prevent camera from going outside of game  boundaries
+		if (cameraRight - guiWorldWidth > this.maxWorldX) {
+			moveVector.x = maxWorldX - (((cameraRight) - cameraLeft)/2) + guiWorldWidth;
+			transform.position = new Vector3 (moveVector.x, CAMERA_HEIGHT, moveVector.z);;
+		}
+
+		if (cameraLeft < this.minWorldX) {
+			moveVector.x = minWorldX + (cameraRight - cameraLeft)/2;
+			transform.position = new Vector3 (moveVector.x, CAMERA_HEIGHT, moveVector.z);
+		}
+
+		if (cameraTop > this.maxWorldZ) {
+			moveVector.z = maxWorldZ - (cameraTop - cameraBottom)/2;
+			transform.position = new Vector3 (moveVector.x, CAMERA_HEIGHT, moveVector.z);
+		}
+
+		if (cameraBottom < this.minWorldZ) {
+			moveVector.z = minWorldZ + (cameraTop - cameraBottom)/2;
+			transform.position = new Vector3 (moveVector.x, CAMERA_HEIGHT, moveVector.z);
+		}
+	}
+
+	/*********************************************************************************/
+	/*	Getter and Setter Functions - Order: Alphabetic								 */		
+	/*********************************************************************************/
+
+	public float getGUIScreenWidth() {
+		return this.guiScreenWidth;
 	}
 }
