@@ -20,6 +20,23 @@ public class Grid : MonoBehaviour {
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
 
+	public void Awake() {
+		this.nodeRadius = .75f;
+		this.unwalkableMask = LayerMask.GetMask("Unwalkable");
+		this.Floor = LayerMask.GetMask("Floor");
+		this.Ground = LayerMask.GetMask("Ground");
+		this.Ramp = LayerMask.GetMask("Ramp");
+	}
+
+	public void Start() {
+
+		GameObject game = GameObject.Find ("Game");
+		Renderer groundRenderer = game.GetComponent<Renderer>();
+		Vector3 groundSize = groundRenderer.bounds.size;
+		this.gridWorldSize = new Vector2(groundSize.x, groundSize.z);
+		this.CreateGrid ();
+	}
+
 	public void Update(){
 		updateGrid ();
 	}
@@ -132,34 +149,6 @@ public class Grid : MonoBehaviour {
 				grid[x,y] = new Node(floorNum,worldPoint,x,y);
 			}
 		}
-	}
-
-	/*********************************************************************************/
-	/*	Getter and Setter Functions - Order: Alphabetic							 	 */		
-	/*********************************************************************************/
-
-	public void setFloor(LayerMask _floor) {
-		this.Floor = _floor;
-	}
-
-	public void setGridWorldSize(Vector2 _gridWorldSize) {
-		this.gridWorldSize = _gridWorldSize;
-	}
-
-	public void setGround(LayerMask _ground) {
-		this.Ground = _ground;
-	}
-
-	public void setNodeRadius(float _nodeRadius) {
-		this.nodeRadius = _nodeRadius;
-	}
-
-	public void setRamp(LayerMask _ramp) {
-		this.Ramp = _ramp;
-	}
-
-	public void setUnwalkableMask(LayerMask _unwalkableMask) {
-		this.unwalkableMask = _unwalkableMask;
 	}
 
 	/*********************************************************************************/

@@ -8,30 +8,21 @@ using System;
 public class GUIManager : MonoBehaviour
 {	
 	// Constants
-	private float GUI_WIDTH = 150f;
+	public static float GUI_WIDTH = 150f;
 	private float TAB_HEIGHT = 20f;
 	
 	private GameObject buildingList;
 	private Button buildingsTab;
 	private Canvas canvas;
 	private CameraManager cameraManager;
-	private Grid grid;
 	private float guiButtonContainerHeight;
-	private float guiScreenWidth = 0;
-	private float guiWorldWidth = 0;
 	private PersonPlayer player;
 	private float previousGuiButtonContainerHeight;
-	private GameObject tabs;
 	private Button unitButton0;
 	private Button unitButton1;
 	private GameObject unitList;
 	private Button unitsTab;
 	private Text unitTabText;
-	
-	// Prefabs
-	private GameObject buildingListPrefab;
-	private GameObject tabsPrefab;
-	private GameObject unitListPrefab;
 
 	// Transforms
 	private RectTransform[] buildingButtonTransforms;
@@ -44,6 +35,9 @@ public class GUIManager : MonoBehaviour
 	private RectTransform unitListRectTransform;
 	private RectTransform unitTabTransform;
 
+	// Debug
+	private Grid grid;
+
 	/*********************************************************************************/
 	/*	Functions inherited from MonoBehaviour	- Order: Relevance					 */		
 	/*********************************************************************************/
@@ -51,9 +45,9 @@ public class GUIManager : MonoBehaviour
 	void Awake ()
 	{
 		// Load Resources
-		this.tabsPrefab = Resources.Load<GameObject> ("GUITabs");
-		this.buildingListPrefab = Resources.Load<GameObject> ("GUIBuildingList");
-		this.unitListPrefab = Resources.Load<GameObject> ("GUIUnitList");
+		GameObject tabsPrefab = Resources.Load<GameObject> ("GUITabs");
+		GameObject buildingListPrefab = Resources.Load<GameObject> ("GUIBuildingList");
+		GameObject unitListPrefab = Resources.Load<GameObject> ("GUIUnitList");
 
 		GameObject playerGameObject = GetComponent<Transform> ().gameObject;
 		this.player = playerGameObject.GetComponent<PersonPlayer> ();
@@ -72,8 +66,8 @@ public class GUIManager : MonoBehaviour
 		canvasObject.AddComponent<GraphicRaycaster> ();
 		
 		// Add tabs to canvas
-		this.tabs = (GameObject)Instantiate (tabsPrefab);
-		this.tabs.transform.SetParent (canvas.transform, false);
+		GameObject tabs = (GameObject)Instantiate (tabsPrefab);
+		tabs.transform.SetParent (canvas.transform, false);
 		this.tabTransform = tabs.GetComponent<RectTransform> ();
 		this.buildingsTab = GameObject.Find ("BuildingsTab").GetComponentInChildren<Button> ();
 		this.buildingTabTransform = buildingsTab.GetComponent<RectTransform> ();
@@ -107,6 +101,9 @@ public class GUIManager : MonoBehaviour
 	}
 	
 	private void Start() {
+
+		GameObject game = GameObject.Find ("Game");
+		this.grid = game.GetComponent<Grid>();
 
 		// Set initial sizes of GUI elements
 		this.canvasRectTransform = this.canvas.GetComponent<RectTransform> ();;
@@ -181,8 +178,7 @@ public class GUIManager : MonoBehaviour
 		});
 
 		// Give camera width of GUI
-		this.guiScreenWidth = tabTransform.rect.width;
-		this.cameraManager.setGUIWidths (this.guiScreenWidth);
+		this.cameraManager.setGUIWidths (tabTransform.rect.width);
 	}
 
 	private void Update() {
@@ -196,14 +192,6 @@ public class GUIManager : MonoBehaviour
 			this.unitListRectTransform.sizeDelta = new Vector2 (GUI_WIDTH, guiButtonContainerHeight);
 			this.unitListRectTransform.anchoredPosition = new Vector2 (-GUI_WIDTH / 2, guiButtonContainerHeight / 2);
 		}
-	}
-
-	/*********************************************************************************/
-	/*	Private Functions - Order: Alphabetic										 */		
-	/*********************************************************************************/
-
-	public void initializeMiniMap(Grid _grid) {
-		this.grid = _grid;
 	}
 
 	/*********************************************************************************/
